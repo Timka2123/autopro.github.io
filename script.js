@@ -264,22 +264,22 @@ function showAnalysis(id) {
   container.style.display = 'block';
 
   if (container._chart) container._chart.destroy();
-  const ctx = document.getElementById(`chart-${id}`).getContext('2d');
-  container._chart = new Chart(ctx, {
+  // внутри showAnalysis, после получения массива prices и готовки <canvas>
+if (container._chart) container._chart.destroy();
+const ctx = document.getElementById(`chart-${id}`).getContext('2d');
+container._chart = new Chart(ctx, {
   type: 'line',
   data: {
-    labels: monthNames, // ["Январь", ...] длина 12!
+    labels: monthNames,        // ["Январь", "Февраль", ...]
     datasets: [{
-      label: 'Продажи, шт.',
-      data: sales,        // [17, 21, ...] длина 12!
-      borderColor: '#22c55e',
-      backgroundColor: 'rgba(34,197,94,0.08)',
-      tension: 0,
-      fill: true,
+      label: 'Цена, ₽',
+      data: prices,            // [200, 240, ...]
+      borderColor: '#facc15',
+      backgroundColor: 'rgba(250,204,21,0.1)',
+      fill: false,
+      tension: 0.1,
       pointRadius: 5,
-      pointHoverRadius: 9,
-      pointBackgroundColor: '#facc15',
-      pointBorderColor: '#22c55e'
+      pointHoverRadius: 9
     }]
   },
   options: {
@@ -291,34 +291,31 @@ function showAnalysis(id) {
         mode: 'nearest',
         intersect: true,
         callbacks: {
-          title: ctx => ctx[0].label,
-          label: context => {
-            const i = context.dataIndex;
-            return [
-              `Продажи: ${sales[i]} шт.`,
-              `Цена: ${prices[i]} ₽`
-            ];
+          // заголовок подсказки — название месяца
+          title: items => items[0].label,
+          // основная строка подсказки — цена и, как вариант, диапазон дней
+          label: ctx => {
+            const i = ctx.dataIndex;
+            return `Цена: ${prices[i]} ₽`;
+            // если нужно показать диапазон дней, можно здесь вычислить:
+            // const start = new Date(год, i, 1);
+            // const end   = new Date(год, i+1, 0);
+            // return [`Цена: ${prices[i]} ₽`, `Период: ${start.getDate()}.${start.getMonth()+1} – ${end.getDate()}.${end.getMonth()+1}`];
           }
         }
       }
     },
-    interaction: {
-      mode: 'nearest',
-      intersect: true
-    },
     scales: {
       x: {
-        title: { display: true, text: 'Месяц' },
-        // offset: false // убедись, что offset НЕ включён!
+        title: { display: true, text: 'Месяц' }
       },
       y: {
-        beginAtZero: true,
-        title: { display: true, text: 'Продажи' }
+        title: { display: true, text: 'Цена, ₽' },
+        beginAtZero: false
       }
     }
   }
 });
-
 }
 
 
