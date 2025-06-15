@@ -1261,3 +1261,17 @@ section{
     color: #2ecc71;
     border: 1px solid #2ecc71;
 }
+
+@keyframes priceUp {
+  0%   { background:#1b5e20; color:#fff; }
+  80%  { background:#1b5e20; color:#fff; }
+  100% { background:transparent; color:inherit; }
+}
+@keyframes priceDown {
+  0%   { background:#b71c1c; color:#fff; }
+  80%  { background:#b71c1c; color:#fff; }
+  100% { background:transparent; color:inherit; }
+}
+
+.price-up   { animation:priceUp   1.5s ease-out; }
+.price-down { animation:priceDown 1.5s ease-out; }

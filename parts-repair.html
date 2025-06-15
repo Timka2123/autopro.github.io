@@ -68,6 +68,7 @@
 const REFRESH_MS = 30_000;          // 30 секунд
 
 /* ====== ГЛОБАЛЬНЫЕ ДАННЫЕ ====== */
+let prevPriceIndex = new Map();
 let partsData    = [];
 let lastDigest   = null;
 
@@ -167,7 +168,7 @@ function renderParts(arr){
                '<i class="far fa-star"></i>';
 
     return `
-      <div class="item">
+      <div class="item" data-id="${p.id}">
         ${badge}
         <img src="${p.img}" alt="${p.name}">
         <h3>${p.name}</h3>
@@ -178,7 +179,22 @@ function renderParts(arr){
       </div>`;
   }).join('');
 }
+// ─── подсветка изменившихся цен ───
+items.forEach(p => {
+  const old = prevPriceIndex.get(p.id);
+  if (old !== undefined && old !== p.price) {
+    const priceEl = document.querySelector(`.item[data-id="${p.id}"] .price`);
+    if (priceEl) {
+      priceEl.classList.add(p.price > old ? 'price-up' : 'price-down');
+      setTimeout(()=>priceEl.classList.remove('price-up','price-down'), 1800);
+    }
+  }
+  // обновляем индекс для следующего раза
+  prevPriceIndex.set(p.id, p.price);
+});
 </script>
+
+
 
 <script src="script.js"></script>
 </body>
