@@ -2,14 +2,14 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <title>Каталог запчастей</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <!-- Внешние стили и иконки -->
   <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="style.css">
-  <title>Каталог запчастей</title>
 </head>
 <body>
-
 <header class="header active">
   <div id="menu-btn" class="fas fa-bars"></div>
   <a href="index.html" class="logo"><span>авто</span>Партс</a>
@@ -26,8 +26,6 @@
 
 <section class="parts-repair">
   <h1 class="heading">Каталог <span>запчастей</span></h1>
-
-  <!-- ФИЛЬТРЫ -->
   <div class="filters-container">
     <div class="filter-box">
       <h3>Категория</h3>
@@ -62,17 +60,23 @@
   <div class="catalog" id="parts-catalog"></div>
 </section>
 
-<script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"></script>
+<!-- Chart.js для графика анализа -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- твой script.js (меню, эффекты и т.д.) -->
+<script src="script.js"></script>
 
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-
+// ======= ГЛОБАЛЬНЫЕ ДАННЫЕ =======
 let partsData = [];
 let prevPrices = new Map();
-const REFRESH_MS = 30000; // как часто обновлять (мс)
+const REFRESH_MS = 30000;
+const updatedProducts = new Set();
+const monthNames = [
+  'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+  'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+];
 
+// ======= ЗАГРУЗКА И АВТО-ОБНОВЛЕНИЕ =======
 document.addEventListener('DOMContentLoaded', () => {
   loadAndRender();
   setInterval(loadAndRender, REFRESH_MS);
@@ -85,7 +89,6 @@ function loadAndRender() {
     .then(data => {
       partsData = data;
       renderParts(partsData);
-      // Заполняем фильтры категориями/брендами
       populateFilters();
     })
     .catch(err => {
@@ -94,14 +97,12 @@ function loadAndRender() {
     });
 }
 
-// Автоматически заполнять фильтры категориями и брендами из данных
+// ======= ФИЛЬТРЫ =======
 function populateFilters() {
   const categorySelect = document.getElementById('category-select');
   const brandSelect = document.getElementById('brand-select');
-  // Сохраняем выбранные значения (чтобы не сбивались при обновлении)
   const catValue = categorySelect.value;
   const brValue  = brandSelect.value;
-
   categorySelect.innerHTML = '<option value="all">Все категории</option>';
   brandSelect.innerHTML = '<option value="all">Все бренды</option>';
   [...new Set(partsData.map(p => p.category))].forEach(cat => {
@@ -110,12 +111,11 @@ function populateFilters() {
   [...new Set(partsData.map(p => p.brand))].forEach(br => {
     brandSelect.innerHTML += `<option value="${br}">${br}</option>`;
   });
-
   categorySelect.value = catValue;
   brandSelect.value    = brValue;
 }
 
-// Функция для фильтрации товаров (при нажатии кнопки "Применить")
+// ======= ФИЛЬТРАЦИЯ =======
 function filterItems() {
   const cat  = document.getElementById('category-select').value;
   const br   = document.getElementById('brand-select').value;
@@ -141,20 +141,13 @@ function filterItems() {
   }
   renderParts(items);
 }
-</script>
 
-const updatedProducts = new Set();
-const monthNames = [
-  'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-  'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
-];
-
+// ======= РЕНДЕР КАТАЛОГА =======
 function lowerAfterFirst(str) {
   return str.replace(/([А-ЯA-ZЁ])[А-ЯA-ZЁа-яa-zё0-9\-]*/g, (word, p1, offset) =>
     offset === 0 ? word : word[0].toLowerCase() + word.slice(1)
   );
 }
-
 function renderParts(arr) {
   const box = document.getElementById('parts-catalog');
   if (!arr.length) {
@@ -177,22 +170,15 @@ function renderParts(arr) {
     let priceClass = '';
     const oldPrice = prevPrices.get(p.id);
     let flag = '';
-    // Если цена когда-либо менялась — всегда показываем флаг
     if (updatedProducts.has(p.id)) {
-      flag = `<span class="price-flag">
-        <i class="fas fa-sync-alt" style="font-size:.95em;"></i> Цена обновлена
-      </span>`;
+      flag = `<span class="price-flag"><i class="fas fa-sync-alt" style="font-size:.95em;"></i> Цена обновлена</span>`;
     }
-    // Для новых изменений — подсветка + добавим в updatedProducts
     if (oldPrice !== undefined && oldPrice !== p.price) {
       priceClass = p.price > oldPrice ? 'price-up' : 'price-down';
       updatedProducts.add(p.id);
-      flag = `<span class="price-flag">
-        <i class="fas fa-sync-alt" style="font-size:.95em;"></i> Цена обновлена
-      </span>`;
+      flag = `<span class="price-flag"><i class="fas fa-sync-alt" style="font-size:.95em;"></i> Цена обновлена</span>`;
     }
 
-    // Кнопка и контейнер анализа спроса
     return `
       <div class="item" data-id="${p.id}">
         ${badge}
@@ -214,7 +200,6 @@ function renderParts(arr) {
     `;
   }).join('');
 
-  // После отрисовки: обработка анимации и всплывашки
   arr.forEach(p => {
     const itemEl  = document.querySelector(`.item[data-id="${p.id}"]`);
     const priceEl = itemEl?.querySelector('.price');
@@ -238,13 +223,11 @@ function renderParts(arr) {
       setTimeout(() => {
         toastEl.classList.remove('show');
         priceEl?.classList.remove('price-up','price-down');
-        // flagEl остается видимым!
       }, 1800);
     }
     prevPrices.set(p.id, p.price);
   });
 
-  // Привязываем обработчики кнопок анализа спроса
   document.querySelectorAll('.analysis-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       const id = btn.getAttribute('data-id');
@@ -253,7 +236,7 @@ function renderParts(arr) {
   });
 }
 
-// ---- Анализ спроса и построение графика ----
+// ======= АНАЛИЗ СПРОСА =======
 function showAnalysis(id) {
   const part = partsData.find(p => String(p.id) === String(id));
   const container = document.getElementById('analysis-' + id);
@@ -303,15 +286,5 @@ function showAnalysis(id) {
   });
 }
 </script>
-
-
-
-
-</script>
-
-
-
-
-<script src="script.js"></script>
 </body>
 </html>
