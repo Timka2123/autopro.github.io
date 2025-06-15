@@ -276,8 +276,8 @@ function showAnalysis(id) {
         backgroundColor: 'rgba(34,197,94,0.08)',
         tension: 0,
         fill: true,
-        pointRadius: 7,
-        pointHoverRadius: 13,
+        pointRadius: 9,
+        pointHoverRadius: 15,
         pointBackgroundColor: '#facc15',
         pointBorderColor: '#22c55e'
       }]
@@ -320,6 +320,7 @@ function showAnalysis(id) {
     }
   });
 }
+
 
 
 
