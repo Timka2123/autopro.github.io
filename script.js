@@ -189,7 +189,7 @@ function renderParts(arr) {
           <span class="price-value">${p.price.toLocaleString('ru-RU')}</span> <span>₽</span>
           ${flag}
         </div>
-        <button class="btn analysis-btn" data-id="${p.id}" style="margin-top:8px;">Показать анализ спроса</button>
+        <button class="btn analysis-btn" data-id="${p.id}" style="margin-top:8px;">Показать историю цен</button>
         <div class="analysis-container" id="analysis-${p.id}" style="display:none; margin-top:16px;"></div>
         <div class="toast-hint" id="toast-${p.id}"></div>
         <p>${p.description || ''}</p>
@@ -242,13 +242,15 @@ function showAnalysis(id) {
   if (!part || !container) return;
 
   const sales = Array.isArray(part.sold) && part.sold.length === 12 ? part.sold : Array(12).fill(0);
+  const prices = Array.isArray(part.currency) && part.currency.length === 12 ? part.currency : Array(12).fill(part.price);
+
   const avg = sales.reduce((a,b)=>a+b,0)/sales.length || 1;
   const seasonality = sales.map(x => (x/avg).toFixed(2));
   const nextMonth = (new Date().getMonth() + 1) % 12;
   const forecast = Math.round(avg * seasonality[nextMonth]);
 
   container.innerHTML = `
-    <div style="font-size:1.1em;margin-bottom:0.5em;"><b>Анализ спроса:</b></div>
+    <div style="font-size:1.1em;margin-bottom:0.5em;"><b>История цен:</b></div>
     <canvas id="chart-${id}" width="440" height="190" style="max-width:100%;display:block"></canvas>
     <div style="margin-top:0.5em;">
       <span>Средний спрос: <b>${avg.toFixed(1)}</b> шт/мес</span><br>
@@ -261,39 +263,50 @@ function showAnalysis(id) {
   if (container._chart) container._chart.destroy();
   const ctx = document.getElementById(`chart-${id}`).getContext('2d');
   container._chart = new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: monthNames,
-    datasets: [{
-      label: 'Продажи, шт.',
-      data: sales,
-      borderColor: '#22c55e',
-      backgroundColor: 'rgba(34,197,94,0.08)',
-      tension: 0.24,
-      fill: true,
-      pointRadius: 3
-    }]
-  },
-  options: {
-    responsive: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        enabled: true,
-        callbacks: {
-          label: function(context) {
-            return `Продажи, шт: ${context.parsed.y}`;
+    type: 'line',
+    data: {
+      labels: monthNames,
+      datasets: [{
+        label: 'Цена, руб.',
+        data: sales,
+        borderColor: '#22c55e',
+        backgroundColor: 'rgba(34,197,94,0.08)',
+        tension: 0.24,
+        fill: true,
+        pointRadius: 3
+      }]
+    },
+    options: {
+      responsive: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          enabled: true,
+          callbacks: {
+            title: function(ctx) {
+              return ctx[0].label;
+            },
+            label: function(context) {
+              // Узнаём индекс точки (месяца)
+              const i = context.dataIndex;
+              const prod = context.parsed.y;
+              const price = prices[i];
+              return [
+                `Продажи: ${prod} шт.`,
+                `Цена: ${price ? price + ' ₽' : '—'}`
+              ];
+            }
           }
         }
+      },
+      scales: {
+        y: { beginAtZero: true, title: { display: true, text: 'Продажи' } },
+        x: { title: { display: true, text: 'Месяц' } }
       }
-    },
-    scales: {
-      y: { beginAtZero: true, title: { display: true, text: 'Продажи' } },
-      x: { title: { display: true, text: 'Месяц' } }
     }
-  }
-});
+  });
 }
+
 
 function lowerAfterFirstWord(str) {
   return str.replace(/^\s*(\S+)/, (m, w) =>
