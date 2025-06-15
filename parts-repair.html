@@ -154,6 +154,10 @@ function renderParts(arr) {
     box.innerHTML = '<div class="no-results"><i class="fas fa-search"></i><h3>Ничего не найдено</h3></div>';
     return;
   }
+  function lowerAfterFirstWord(str) {
+  return str.replace(/^\S+/, w => w[0].toUpperCase() + w.slice(1).toLowerCase())
+            .replace(/(\s+)(\S+)/g, (m, space, w) => space + w.toLowerCase());
+  }
 
   box.innerHTML = arr.map(p => {
     let badge = '', stockTxt = '', stockClass = '';
@@ -184,8 +188,8 @@ function renderParts(arr) {
         ${badge}
         <div class="brand-logo">${p.brand}</div>
         <img src="${p.img}" alt="${p.name}">
-        <h3>${p.name}</h3>
-        <div class="category" data-category="${p.category}">${p.category}</div>
+        <h3>${lowerAfterFirstWord(p.name)}</h3>
+        <div class="category" data-category="${p.category}">${lowerAfterFirstWord(p.category)}</div>
         <div class="price ${priceClass}">
           <span class="price-value">${p.price.toLocaleString('ru-RU')}</span> <span>₽</span>
           ${flag}

@@ -567,6 +567,13 @@ section{
     resize: none;
 }
 
+.chartjs-tooltip {
+  white-space: nowrap;
+  max-width: 180px;
+  font-size: 1em;
+  z-index: 100;
+}
+
 .footer{
     background: var(--light-yellow);
     padding-bottom: 8rem;
