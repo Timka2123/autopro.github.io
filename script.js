@@ -235,7 +235,7 @@ function renderParts(arr) {
   });
 }
 
-// ======= АНАЛИЗ ЦЕНЫ =======
+// ======= АНАЛИЗ ЦЕНЫ ======= (обновленная функция)
 function showAnalysis(id) {
   const part = partsData.find(p => String(p.id) === String(id));
   const container = document.getElementById('analysis-' + id);
@@ -264,58 +264,68 @@ function showAnalysis(id) {
   container.style.display = 'block';
 
   if (container._chart) container._chart.destroy();
-  // внутри showAnalysis, после получения массива prices и готовки <canvas>
-if (container._chart) container._chart.destroy();
-const ctx = document.getElementById(`chart-${id}`).getContext('2d');
-container._chart = new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: monthNames,        // ["Январь", "Февраль", ...]
-    datasets: [{
-      label: 'Цена, ₽',
-      data: prices,            // [200, 240, ...]
-      borderColor: '#facc15',
-      backgroundColor: 'rgba(250,204,21,0.1)',
-      fill: false,
-      tension: 0.1,
-      pointRadius: 5,
-      pointHoverRadius: 9
-    }]
-  },
-  options: {
-    responsive: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        enabled: true,
-        mode: 'nearest',
-        intersect: true,
-        callbacks: {
-          // заголовок подсказки — название месяца
-          title: items => items[0].label,
-          // основная строка подсказки — цена и, как вариант, диапазон дней
-          label: ctx => {
-            const i = ctx.dataIndex;
-            return `Цена: ${prices[i]} ₽`;
-            // если нужно показать диапазон дней, можно здесь вычислить:
-            // const start = new Date(год, i, 1);
-            // const end   = new Date(год, i+1, 0);
-            // return [`Цена: ${prices[i]} ₽`, `Период: ${start.getDate()}.${start.getMonth()+1} – ${end.getDate()}.${end.getMonth()+1}`];
+  
+  const ctx = document.getElementById(`chart-${id}`).getContext('2d');
+  
+  // Массив названий месяцев в родительном падеже для подсказок
+  const monthNamesGenitive = [
+    'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+    'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+  ];
+
+  container._chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: monthNames,
+      datasets: [{
+        label: 'Цена, ₽',
+        data: prices,
+        borderColor: '#facc15',
+        backgroundColor: 'rgba(250,204,21,0.1)',
+        fill: false,
+        tension: 0.1,
+        pointRadius: 5,
+        pointHoverRadius: 9
+      }]
+    },
+    options: {
+      responsive: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          enabled: true,
+          mode: 'nearest',
+          intersect: true,
+          callbacks: {
+            title: items => items[0].label,
+            label: ctx => {
+              const i = ctx.dataIndex;
+              const price = prices[i];
+              
+              // Рассчитываем первый и последний день месяца
+              const year = new Date().getFullYear();
+              const firstDay = 1;
+              const lastDay = new Date(year, i + 1, 0).getDate();
+              
+              return [
+                `Цена: ${price} ₽`,
+                `Период: ${firstDay}-${lastDay} ${monthNamesGenitive[i]}`
+              ];
+            }
           }
         }
-      }
-    },
-    scales: {
-      x: {
-        title: { display: true, text: 'Месяц' }
       },
-      y: {
-        title: { display: true, text: 'Цена, ₽' },
-        beginAtZero: false
+      scales: {
+        x: {
+          title: { display: true, text: 'Месяц' }
+        },
+        y: {
+          title: { display: true, text: 'Цена, ₽' },
+          beginAtZero: false
+        }
       }
     }
-  }
-});
+  });
 }
 
 
