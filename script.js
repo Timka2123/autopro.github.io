@@ -276,8 +276,8 @@ function showAnalysis(id) {
       backgroundColor: 'rgba(34,197,94,0.08)',
       tension: 0,
       fill: true,
-      pointRadius: 9,
-      pointHoverRadius: 15,
+      pointRadius: 12,
+      pointHoverRadius: 18,
       pointBackgroundColor: '#facc15',
       pointBorderColor: '#22c55e'
     }]
@@ -288,13 +288,11 @@ function showAnalysis(id) {
       legend: { display: false },
       tooltip: {
         enabled: true,
-        mode: 'point',      // <<<<<< САМОЕ ВАЖНОЕ
-        intersect: true,    // <<<<<< САМОЕ ВАЖНОЕ
+        mode: 'nearest',   // ТОЛЬКО ТАК!
+        intersect: true,
         callbacks: {
-          title: function(ctx) {
-            return ctx[0].label; // месяц
-          },
-          label: function(context) {
+          title: ctx => ctx[0].label,
+          label: context => {
             const i = context.dataIndex;
             return [
               `Продажи: ${sales[i]} шт.`,
@@ -305,8 +303,8 @@ function showAnalysis(id) {
       }
     },
     interaction: {
-      mode: 'point',       // <<<<<< САМОЕ ВАЖНОЕ
-      intersect: true      // <<<<<< САМОЕ ВАЖНОЕ
+      mode: 'nearest',    // ТОЛЬКО ТАК!
+      intersect: true
     },
     scales: {
       y: {
