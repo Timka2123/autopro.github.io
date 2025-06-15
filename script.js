@@ -266,46 +266,65 @@ function showAnalysis(id) {
     type: 'line',
     data: {
       labels: monthNames,
-      datasets: [{
-        label: 'Цена, руб.',
-        data: sales,
-        borderColor: '#22c55e',
-        backgroundColor: 'rgba(34,197,94,0.08)',
-        tension: 0.24,
-        fill: true,
-        pointRadius: 3
-      }]
+      datasets: [
+        {
+          label: 'Продажи, шт.',
+          data: sales,
+          borderColor: '#22c55e',
+          backgroundColor: 'rgba(34,197,94,0.08)',
+          tension: 0.24,
+          fill: true,
+          pointRadius: 3,
+          yAxisID: 'y',
+        },
+        {
+          label: 'Цена, ₽',
+          data: prices,
+          borderColor: '#facc15',
+          backgroundColor: 'rgba(250,204,21,0.12)',
+          tension: 0.18,
+          fill: false,
+          pointRadius: 3,
+          yAxisID: 'y1',
+        }
+      ]
     },
     options: {
       responsive: false,
       plugins: {
-        legend: { display: false },
+        legend: { display: true },
         tooltip: {
           enabled: true,
           callbacks: {
-            title: function(ctx) {
-              return ctx[0].label;
-            },
             label: function(context) {
-              // Узнаём индекс точки (месяца)
-              const i = context.dataIndex;
-              const prod = context.parsed.y;
-              const price = prices[i];
-              return [
-                `Продажи: ${prod} шт.`,
-                `Цена: ${price ? price + ' ₽' : '—'}`
-              ];
+              if (context.dataset.label === 'Продажи, шт.') {
+                return `Продажи: ${context.parsed.y} шт.`;
+              } else if (context.dataset.label === 'Цена, ₽') {
+                return `Цена: ${context.parsed.y} ₽`;
+              }
+              return '';
             }
           }
         }
       },
       scales: {
-        y: { beginAtZero: true, title: { display: true, text: 'Продажи' } },
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: 'Продажи' },
+          position: 'left',
+        },
+        y1: {
+          beginAtZero: false,
+          title: { display: true, text: 'Цена' },
+          position: 'right',
+          grid: { drawOnChartArea: false }
+        },
         x: { title: { display: true, text: 'Месяц' } }
       }
     }
   });
 }
+
 
 
 function lowerAfterFirstWord(str) {
