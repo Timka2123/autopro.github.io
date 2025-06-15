@@ -267,44 +267,64 @@ function showAnalysis(id) {
   container.style.display = 'block';
 
   // Custom Tooltip (точный месяц, fade-out)
-  function customTooltip(context) {
-    const tooltipEl = document.getElementById(`custom-tooltip-${id}`);
-    const chart = context.chart;
-    const tooltip = context.tooltip;
-    if (!tooltipEl || !tooltip || !tooltip.dataPoints?.length) return;
+ function customTooltip(context) {
+  const tooltipEl = document.getElementById(`custom-tooltip-${id}`);
+  const chart = context.chart;
+  const tooltip = context.tooltip;
+  if (!tooltipEl || !tooltip || !tooltip.dataPoints?.length) return;
 
-    if (tooltip.opacity === 0) {
-      tooltipEl.style.opacity = 0;
-      tooltipEl.style.display = 'none';
-      return;
-    }
-
-    const i = tooltip.dataPoints[0].dataIndex;
-    const month = monthNames[i];
-    const prod = sales[i];
-    const price = prices[i];
-
-    tooltipEl.innerHTML = `
-      <div style="padding:0.4em 0.9em;">
-        <b>${month}</b><br>
-        <span>Продажи: <b>${prod}</b> шт.</span><br>
-        <span>Цена: <b>${price}</b> ₽</span>
-      </div>
-    `;
-
-    tooltipEl.style.display = 'block';
-    tooltipEl.style.opacity = 1;
-    tooltipEl.style.position = 'absolute';
-    tooltipEl.style.pointerEvents = 'none';
-    tooltipEl.style.left = chart.canvas.offsetLeft + tooltip.caretX + 16 + 'px';
-    tooltipEl.style.top  = chart.canvas.offsetTop + tooltip.caretY - 36 + 'px';
-    tooltipEl.style.background = 'rgba(34,34,34,0.98)';
-    tooltipEl.style.color = '#facc15';
-    tooltipEl.style.borderRadius = '7px';
-    tooltipEl.style.fontSize = '1em';
-    tooltipEl.style.transition = 'opacity 0.5s';
-    tooltipEl.style.zIndex = 100;
+  if (tooltip.opacity === 0) {
+    tooltipEl.style.opacity = 0;
+    tooltipEl.style.display = 'none';
+    return;
   }
+
+  const i = tooltip.dataPoints[0].dataIndex;
+  const month = monthNames[i];
+  const prod = sales[i];
+  const price = prices[i];
+
+  tooltipEl.innerHTML = `
+    <div style="padding:0.4em 0.9em;">
+      <b>${month}</b><br>
+      <span>Продажи: <b>${prod}</b> шт.</span><br>
+      <span>Цена: <b>${price}</b> ₽</span>
+    </div>
+  `;
+
+  tooltipEl.style.display = 'block';
+  tooltipEl.style.opacity = 1;
+  tooltipEl.style.position = 'absolute';
+  tooltipEl.style.pointerEvents = 'none';
+  tooltipEl.style.background = 'rgba(34,34,34,0.98)';
+  tooltipEl.style.color = '#facc15';
+  tooltipEl.style.borderRadius = '7px';
+  tooltipEl.style.fontSize = '1em';
+  tooltipEl.style.transition = 'opacity 0.5s';
+  tooltipEl.style.zIndex = 100;
+  tooltipEl.style.minWidth = '135px';
+
+  // === Позиционирование: не вылезать за правый/левый край ===
+  const chartRect = chart.canvas.getBoundingClientRect();
+  const parentRect = chart.canvas.parentNode.getBoundingClientRect();
+  const canvasOffsetLeft = chart.canvas.offsetLeft;
+  const canvasOffsetTop = chart.canvas.offsetTop;
+  const tooltipWidth = tooltipEl.offsetWidth || 150;
+
+  let left = canvasOffsetLeft + tooltip.caretX + 16;
+  let top  = canvasOffsetTop + tooltip.caretY - 36;
+
+  // Если tooltip вылезает за правый край — показать слева от точки
+  if (left + tooltipWidth > chart.width + canvasOffsetLeft) {
+    left = canvasOffsetLeft + tooltip.caretX - tooltipWidth - 16;
+  }
+  // Если tooltip вылезает за левый край — поправить
+  if (left < 0) left = 10;
+
+  tooltipEl.style.left = left + 'px';
+  tooltipEl.style.top  = top + 'px';
+}
+
 
   if (container._chart) container._chart.destroy();
   const ctx = document.getElementById(`chart-${id}`).getContext('2d');
@@ -337,7 +357,7 @@ function showAnalysis(id) {
         }
       },
       interaction: {
-        mode: 'index',
+        mode: 'nearest',
         intersect: false
       },
       scales: {
