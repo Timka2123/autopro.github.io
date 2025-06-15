@@ -257,10 +257,49 @@ function showAnalysis(id) {
       <span>Сезонный коэффициент (${monthNames[nextMonth]}): <b>${seasonality[nextMonth]}</b></span><br>
       <span>Прогноз на ${monthNames[nextMonth]}: <b>${forecast}</b> шт</span>
     </div>
+    <div id="custom-tooltip-${id}" class="custom-tooltip" style="display:none"></div>
   `;
   container.style.display = 'block';
 
-  // Не скрываем график автоматически!
+  // Custom Tooltip (fade out)
+  function customTooltip(context) {
+    const tooltipEl = document.getElementById(`custom-tooltip-${id}`);
+    const chart = context.chart;
+    const tooltip = context.tooltip;
+    if (!tooltipEl || !tooltip) return;
+
+    if (tooltip.opacity === 0) {
+      tooltipEl.style.opacity = 0;
+      tooltipEl.style.display = 'none';
+      return;
+    }
+
+    const i = tooltip.dataPoints[0].dataIndex;
+    const month = monthNames[i];
+    const prod = sales[i];
+    const price = prices[i];
+
+    tooltipEl.innerHTML = `
+      <div style="padding:0.4em 0.9em;">
+        <b>${month}</b><br>
+        <span>Продажи: <b>${prod}</b> шт.</span><br>
+        <span>Цена: <b>${price}</b> ₽</span>
+      </div>
+    `;
+
+    tooltipEl.style.display = 'block';
+    tooltipEl.style.opacity = 1;
+    tooltipEl.style.position = 'absolute';
+    tooltipEl.style.pointerEvents = 'none';
+    tooltipEl.style.left = chart.canvas.offsetLeft + tooltip.caretX + 16 + 'px';
+    tooltipEl.style.top  = chart.canvas.offsetTop + tooltip.caretY - 36 + 'px';
+    tooltipEl.style.background = 'rgba(34,34,34,0.98)';
+    tooltipEl.style.color = '#facc15';
+    tooltipEl.style.borderRadius = '7px';
+    tooltipEl.style.fontSize = '1em';
+    tooltipEl.style.transition = 'opacity 0.5s';
+    tooltipEl.style.zIndex = 100;
+  }
 
   if (container._chart) container._chart.destroy();
   const ctx = document.getElementById(`chart-${id}`).getContext('2d');
@@ -283,22 +322,15 @@ function showAnalysis(id) {
       plugins: {
         legend: { display: false },
         tooltip: {
-          enabled: true,
-          callbacks: {
-            title: function(ctx) {
-              return ctx[0].label; // месяц
-            },
-            label: function(context) {
-              const i = context.dataIndex;
-              const prod = sales[i];
-              const price = prices[i];
-              return [
-                `Продажи: ${prod} шт.`,
-                `Цена: ${price} ₽`
-              ];
-            }
-          }
+          enabled: false, // Отключаем стандартный тултип
+          mode: 'index',
+          intersect: false,
+          external: customTooltip
         }
+      },
+      interaction: {
+        mode: 'index',
+        intersect: false
       },
       scales: {
         y: {
@@ -311,7 +343,20 @@ function showAnalysis(id) {
       }
     }
   });
+
+  // Fade out on mouse leave (анимация исчезновения)
+  const chartCanvas = document.getElementById(`chart-${id}`);
+  chartCanvas.addEventListener('mouseleave', () => {
+    const tooltipEl = document.getElementById(`custom-tooltip-${id}`);
+    if (tooltipEl) {
+      tooltipEl.style.opacity = 0;
+      setTimeout(() => {
+        tooltipEl.style.display = 'none';
+      }, 500);
+    }
+  });
 }
+
 
 function lowerAfterFirstWord(str) {
   return str.replace(/^\s*(\S+)/, (m, w) =>

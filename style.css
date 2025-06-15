@@ -1331,4 +1331,10 @@ section{
 }
 .item { position: relative; }
 
+.custom-tooltip {
+  box-shadow: 0 8px 24px rgba(0,0,0,.15);
+  font-weight: 500;
+  border: 1px solid #383828;
+  min-width: 115px;
+}
 
