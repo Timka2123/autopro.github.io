@@ -158,6 +158,15 @@ function lowerAfterFirst(str) {
     offset === 0 ? word : word[0].toLowerCase() + word.slice(1)
   );
 }
+
+
+const updatedProducts = new Set();
+
+function lowerAfterFirst(str) {
+  return str.replace(/([А-ЯA-ZЁ])[А-ЯA-ZЁа-яa-zё0-9\-]*/g, (word, p1, offset) =>
+    offset === 0 ? word : word[0].toLowerCase() + word.slice(1)
+  );
+}
 function renderParts(arr) {
   const box = document.getElementById('parts-catalog');
   if (!arr.length) {
@@ -180,10 +189,18 @@ function renderParts(arr) {
     let priceClass = '';
     const oldPrice = prevPrices.get(p.id);
     let flag = '';
+    // Если цена когда-либо менялась — всегда показываем флаг
+    if (updatedProducts.has(p.id)) {
+      flag = `<span class="price-flag">
+        <i class="fas fa-sync-alt" style="font-size:.95em;"></i> Цена обновлена
+      </span>`;
+    }
+    // Для новых изменений — подсветка + добавим в updatedProducts
     if (oldPrice !== undefined && oldPrice !== p.price) {
       priceClass = p.price > oldPrice ? 'price-up' : 'price-down';
+      updatedProducts.add(p.id); // будет отображать флаг всегда после первого изменения
       flag = `<span class="price-flag">
-        <i class="fas fa-sync-alt" style="font-size:.95em;"></i> Обновлено
+        <i class="fas fa-sync-alt" style="font-size:.95em;"></i> Цена обновлена
       </span>`;
     }
 
@@ -225,23 +242,22 @@ function renderParts(arr) {
       let toast = p.price > old
         ? `Цена увеличилась на ${delta} ₽`
         : `Цена снижена на ${delta} ₽`;
-      toast = lowerAfterFirst(toast); // после первого слова — всё с маленькой буквы
+      toast = lowerAfterFirst(toast);
       toastEl.textContent = toast;
       toastEl.classList.add('show');
       flagEl?.classList.remove('hide');
       setTimeout(() => {
         toastEl.classList.remove('show');
         priceEl?.classList.remove('price-up','price-down');
-        flagEl?.classList.add('hide');
+        // flagEl остается видимым!
       }, 1800);
-    } else if (flagEl) {
-      // скрываем флаг, если цена не изменилась
-      flagEl.classList.add('hide');
     }
+    // если цена не менялась, ничего не делать — если id есть в updatedProducts, флаг уже отображается
     prevPrices.set(p.id, p.price);
   });
 }
 </script>
+
 
 
 </script>
