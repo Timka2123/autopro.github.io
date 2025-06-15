@@ -64,66 +64,70 @@
 
 <script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"></script>
 <script>
-/* ====== НАСТРОЙКИ ====== */
-const REFRESH_MS = 30_000;          // 30 секунд
+const REFRESH_MS = 30_000;
+let partsData = [];
+let prevPrices = new Map();
+let lastDigest = null;
 
-/* ====== ГЛОБАЛЬНЫЕ ДАННЫЕ ====== */
-let prevPriceIndex = new Map();
-let partsData    = [];
-let lastDigest   = null;
-
-/* ====== ПЕРВЫЙ ЗАПУСК И ТАЙМЕР ====== */
+// При загрузке страницы и далее - опрашиваем JSON
 document.addEventListener('DOMContentLoaded', () => {
-  loadJsonAndRender();
-  setInterval(loadJsonAndRender, REFRESH_MS);
-  document.addEventListener('visibilitychange', () => !document.hidden && loadJsonAndRender());
+  loadAndRender();
+  setInterval(loadAndRender, REFRESH_MS);
+  document.addEventListener('visibilitychange', () => !document.hidden && loadAndRender());
 });
 
-/* ====== ЗАГРУЗКА И ПЕРЕРИСОВКА ====== */
-async function loadJsonAndRender(){
-  try{
-    const res  = await fetch(`export_fixed.json?ts=${Date.now()}`,{cache:'no-store'});
-    const data = await res.json();
+function loadAndRender() {
+  fetch('export_fixed.json?ts=' + Date.now(), { cache: 'no-store' })
+    .then(res => res.json())
+    .then(data => {
+      // Заполним картинки и рейтинг, если не хватает
+      data.forEach(part => {
+        if (!part.img) part.img = `image/part-${(part.id % 6) + 1}.png`;
+        if (!part.rating) part.rating = (Math.random() * 1 + 4).toFixed(1);
+      });
 
-    const digest = JSON.stringify(data.map(p=>[p.id,p.price,p.stock]));
-    if (digest === lastDigest) return;               // файл не менялся
-    lastDigest = digest;
+      // Сравним цены с предыдущими
+      const digest = JSON.stringify(data.map(p => [p.id, p.price, p.stock]));
+      if (digest === lastDigest && partsData.length) return;
+      lastDigest = digest;
 
-    partsData = data.map(p=>({
-      ...p,
-      rating: p.rating ?? (Math.random()*1+4).toFixed(1),
-      img:    p.img    ?? `image/part-${Math.floor(Math.random()*6)+1}.png`
-    }));
+      // Основные данные для каталога
+      partsData = data;
+      populateFilters();
+      filterItems();
 
-    populateFilters();
-    filterItems();
-    console.log('[catalog] updated',new Date().toLocaleTimeString());
-  }catch(e){console.error('JSON load error',e);}
+      // Сохраним новые цены для следующей проверки
+      data.forEach(p => prevPrices.set(p.id, p.price));
+    })
+    .catch(err => {
+      document.getElementById('parts-catalog').innerHTML = '<div class="no-results"><i class="fas fa-exclamation-triangle"></i><h3>Ошибка загрузки данных</h3></div>';
+      console.error('Ошибка загрузки JSON:', err);
+    });
 }
 
-/* ====== ФИЛЬТРЫ ====== */
-function populateFilters(){
-  const cats   = ['all',...new Set(partsData.map(p=>p.category))];
-  const brands = ['all',...new Set(partsData.map(p=>p.brand))];
-
-  const catSel = document.getElementById('category-select');
-  const brSel  = document.getElementById('brand-select');
-
-  catSel.innerHTML = cats.map(v=>`<option value="${v}">${v==='all'?'Все категории':v}</option>`).join('');
-  brSel.innerHTML  = brands.map(v=>`<option value="${v}">${v==='all'?'Все бренды':v}</option>`).join('');
+// Фильтры (категория, бренд)
+function populateFilters() {
+  const categorySelect = document.getElementById('category-select');
+  const brandSelect = document.getElementById('brand-select');
+  // Сбросить текущие опции
+  categorySelect.innerHTML = '<option value="all">Все категории</option>';
+  brandSelect.innerHTML = '<option value="all">Все бренды</option>';
+  // Добавить уникальные значения
+  [...new Set(partsData.map(p => p.category))].forEach(cat => {
+    categorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+  });
+  [...new Set(partsData.map(p => p.brand))].forEach(br => {
+    brandSelect.innerHTML += `<option value="${br}">${br}</option>`;
+  });
 }
 
-function filterItems () {
-  // ─── читаем выбранные значения из <select> ───
+function filterItems() {
   const cat  = document.getElementById('category-select').value;
   const br   = document.getElementById('brand-select').value;
   const stk  = document.getElementById('stock-select').value;
   const sort = document.getElementById('sort-select').value;
 
-  // ─── копия данных ───
   let items = partsData.slice();
-
-  // ─── фильтры ───
   if (cat !== 'all') items = items.filter(p => p.category === cat);
   if (br  !== 'all') items = items.filter(p => p.brand    === br);
 
@@ -131,68 +135,72 @@ function filterItems () {
   else if (stk === 'low-stock')    items = items.filter(p => p.stock > 0 && p.stock <= 10);
   else if (stk === 'out-of-stock') items = items.filter(p => p.stock === 0);
 
-  // ─── сортировка ───
-  const cmp = {
-    'price-asc':  (a, b) => a.price - b.price,
-    'price-desc': (a, b) => b.price - a.price,
-    'name-asc':   (a, b) => a.name.localeCompare(b.name),
-    'name-desc':  (a, b) => b.name.localeCompare(a.name),
-    'default':    () => 0
-  }[sort];
-
-  items.sort(cmp);
+  if (sort !== 'default') {
+    const cmp = {
+      'price-asc':  (a, b) => a.price - b.price,
+      'price-desc': (a, b) => b.price - a.price,
+      'name-asc':   (a, b) => a.name.localeCompare(b.name),
+      'name-desc':  (a, b) => b.name.localeCompare(a.name),
+    }[sort];
+    items.sort(cmp);
+  }
   renderParts(items);
 }
 
-/* ====== РЕНДЕР КАРТОЧЕК ====== */
-function renderParts(arr){
+// Сама отрисовка карточек + подсветка цены
+function renderParts(arr) {
   const box = document.getElementById('parts-catalog');
-  if (!arr.length){
-    box.innerHTML =
-      '<div class="no-results"><i class="fas fa-search"></i><h3>Ничего не найдено</h3></div>';
+  if (!arr.length) {
+    box.innerHTML = '<div class="no-results"><i class="fas fa-search"></i><h3>Ничего не найдено</h3></div>';
     return;
   }
-  box.innerHTML = arr.map(p=>{
-    /* бейдж + статус */
-    let badge   = '', stockTxt = '';
-    if (p.stock>10){ stockTxt='В наличии';           badge='<span class="badge new">NEW</span>'; }
-    else if (p.stock>0){ stockTxt=`Мало (${p.stock})`;badge='<span class="badge sale">SALE</span>'; }
-    else { stockTxt='Нет в наличии';                 badge='<span class="badge out">OUT</span>'; }
+  box.innerHTML = arr.map(p => {
+    // --- статус/бейдж ---
+    let badge = '', stockTxt = '', stockClass = '';
+    if (p.stock > 10)      { stockTxt = 'В наличии';        badge = '<span class="badge new">NEW</span>'; stockClass = 'in-stock'; }
+    else if (p.stock > 0)  { stockTxt = `Мало (${p.stock})`; badge = '<span class="badge sale">SALE</span>'; stockClass = 'low-stock'; }
+    else                   { stockTxt = 'Нет в наличии';    badge = '<span class="badge out">OUT</span>';  stockClass = 'out-of-stock'; }
 
-    /* звёздочки */
-    const full = Math.floor(p.rating), half = p.rating%1>=0.5;
+    // --- рейтинг ---
+    const full = Math.floor(p.rating), half = p.rating % 1 >= 0.5;
     let stars = '';
-    for(let i=1;i<=5;i++)
-      stars += i<=full ? '<i class="fas fa-star"></i>' :
-               i===full+1 && half ? '<i class="fas fa-star-half-alt"></i>' :
-               '<i class="far fa-star"></i>';
+    for (let i = 1; i <= 5; i++)
+      stars += i <= full ? '<i class="fas fa-star"></i>' :
+        i === full + 1 && half ? '<i class="fas fa-star-half-alt"></i>' : '<i class="far fa-star"></i>';
+
+    // --- проверка цены ---
+    let priceClass = '';
+    const oldPrice = prevPrices.get(p.id);
+    if (oldPrice !== undefined && oldPrice !== p.price) {
+      priceClass = p.price > oldPrice ? 'price-up' : 'price-down';
+    }
 
     return `
       <div class="item" data-id="${p.id}">
         ${badge}
+        <div class="brand-logo">${p.brand}</div>
         <img src="${p.img}" alt="${p.name}">
         <h3>${p.name}</h3>
-        <p class="price">${p.price.toLocaleString()} ₽</p>
-        <p class="category">${p.category}</p>
-        <p class="stock">${stockTxt}</p>
-        <div class="rating">${stars}</div>
-      </div>`;
+        <div class="category" data-category="${p.category}">${p.category}</div>
+        <div class="price ${priceClass}">${p.price.toLocaleString('ru-RU')} ₽</div>
+        <p>${p.description || ''}</p>
+        <div class="stock ${stockClass}">${stockTxt}</div>
+        <div class="rating">${stars} <span>${p.rating}</span></div>
+      </div>
+    `;
   }).join('');
-}
-// ─── подсветка изменившихся цен ───
-items.forEach(p => {
-  const old = prevPriceIndex.get(p.id);
-  if (old !== undefined && old !== p.price) {
-    const priceEl = document.querySelector(`.item[data-id="${p.id}"] .price`);
-    if (priceEl) {
-      priceEl.classList.add(p.price > old ? 'price-up' : 'price-down');
-      setTimeout(()=>priceEl.classList.remove('price-up','price-down'), 1800);
+
+  // Удаляем классы подсветки после анимации
+  arr.forEach(p => {
+    if (!prevPrices.has(p.id)) return;
+    const item = document.querySelector(`.item[data-id="${p.id}"] .price`);
+    if (item) {
+      setTimeout(() => item.classList.remove('price-up', 'price-down'), 1600);
     }
-  }
-  // обновляем индекс для следующего раза
-  prevPriceIndex.set(p.id, p.price);
-});
+  });
+}
 </script>
+
 
 
 

@@ -1263,15 +1263,15 @@ section{
 }
 
 @keyframes priceUp {
-  0%   { background:#1b5e20; color:#fff; }
-  80%  { background:#1b5e20; color:#fff; }
-  100% { background:transparent; color:inherit; }
+  0%   { background: #22c55e; color: #fff; }
+  80%  { background: #22c55e; color: #fff; }
+  100% { background: transparent; color: inherit; }
 }
 @keyframes priceDown {
-  0%   { background:#b71c1c; color:#fff; }
-  80%  { background:#b71c1c; color:#fff; }
-  100% { background:transparent; color:inherit; }
+  0%   { background: #ef4444; color: #fff; }
+  80%  { background: #ef4444; color: #fff; }
+  100% { background: transparent; color: inherit; }
 }
 
-.price-up   { animation:priceUp   1.5s ease-out; }
-.price-down { animation:priceDown 1.5s ease-out; }
+.price-up   { animation: priceUp   1.5s ease; }
+.price-down { animation: priceDown 1.5s ease; }
