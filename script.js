@@ -266,57 +266,59 @@ function showAnalysis(id) {
   if (container._chart) container._chart.destroy();
   const ctx = document.getElementById(`chart-${id}`).getContext('2d');
   container._chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: monthNames,
-      datasets: [{
-        label: 'Продажи, шт.',
-        data: sales,
-        borderColor: '#22c55e',
-        backgroundColor: 'rgba(34,197,94,0.08)',
-        tension: 0,
-        fill: true,
-        pointRadius: 5,           // Точки меньше!
-        pointHoverRadius: 9,
-        pointBackgroundColor: '#facc15',
-        pointBorderColor: '#22c55e'
-      }]
-    },
-    options: {
-      responsive: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          enabled: true,
-          mode: 'nearest',
-          intersect: true,       // Только по кружку!
-          callbacks: {
-            title: ctx => ctx[0].label,
-            label: context => {
-              const i = context.dataIndex;
-              return [
-                `Продажи: ${sales[i]} шт.`,
-                `Цена: ${prices[i]} ₽`
-              ];
-            }
+  type: 'line',
+  data: {
+    labels: monthNames, // ["Январь", ...] длина 12!
+    datasets: [{
+      label: 'Продажи, шт.',
+      data: sales,        // [17, 21, ...] длина 12!
+      borderColor: '#22c55e',
+      backgroundColor: 'rgba(34,197,94,0.08)',
+      tension: 0,
+      fill: true,
+      pointRadius: 5,
+      pointHoverRadius: 9,
+      pointBackgroundColor: '#facc15',
+      pointBorderColor: '#22c55e'
+    }]
+  },
+  options: {
+    responsive: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        enabled: true,
+        mode: 'nearest',
+        intersect: true,
+        callbacks: {
+          title: ctx => ctx[0].label,
+          label: context => {
+            const i = context.dataIndex;
+            return [
+              `Продажи: ${sales[i]} шт.`,
+              `Цена: ${prices[i]} ₽`
+            ];
           }
         }
+      }
+    },
+    interaction: {
+      mode: 'nearest',
+      intersect: true
+    },
+    scales: {
+      x: {
+        title: { display: true, text: 'Месяц' },
+        // offset: false // убедись, что offset НЕ включён!
       },
-      interaction: {
-        mode: 'nearest',
-        intersect: true         // Только по точке!
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: { display: true, text: 'Продажи' }
-        },
-        x: {
-          title: { display: true, text: 'Месяц' }
-        }
+      y: {
+        beginAtZero: true,
+        title: { display: true, text: 'Продажи' }
       }
     }
-  });
+  }
+});
+
 }
 
 
