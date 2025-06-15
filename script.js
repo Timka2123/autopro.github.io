@@ -280,3 +280,20 @@ function showAnalysis(id) {
     }
   });
 }
+
+function lowerAfterFirstWord(str) {
+  return str.replace(/^\s*(\S+)/, (m, w) =>
+      w[0].toUpperCase() + w.slice(1).toLowerCase()
+    ).replace(/(\s+)(\S+)/g, (m, s, w) =>
+      s + w.toLowerCase()
+    );
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.reviews .swiper-slide .content p').forEach(el => {
+    el.textContent = lowerAfterFirstWord(el.textContent);
+  });
+  document.querySelectorAll('.reviews .swiper-slide .content h3').forEach(el => {
+    el.textContent = lowerAfterFirstWord(el.textContent);
+  });
+});
