@@ -72,6 +72,10 @@ const monthNames = [
   'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
   'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
 ];
+const monthNamesGenitive = [
+  'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+  'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+];
 
 // ======= ФУНКЦИЯ: Первое слово с большой, остальные с маленькой =======
 function lowerAfterFirstWord(str) {
@@ -235,7 +239,7 @@ function renderParts(arr) {
   });
 }
 
-// ======= АНАЛИЗ ЦЕНЫ ======= (обновленная функция)
+// ======= АНАЛИЗ ЦЕНЫ =======
 function showAnalysis(id) {
   const part = partsData.find(p => String(p.id) === String(id));
   const container = document.getElementById('analysis-' + id);
@@ -266,13 +270,6 @@ function showAnalysis(id) {
   if (container._chart) container._chart.destroy();
   
   const ctx = document.getElementById(`chart-${id}`).getContext('2d');
-  
-  // Массив названий месяцев в родительном падеже для подсказок
-  const monthNamesGenitive = [
-    'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
-    'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
-  ];
-
   container._chart = new Chart(ctx, {
     type: 'line',
     data: {
@@ -296,6 +293,14 @@ function showAnalysis(id) {
           enabled: true,
           mode: 'nearest',
           intersect: true,
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          padding: 12,
+          borderColor: '#facc15',
+          borderWidth: 1,
+          cornerRadius: 8,
+          titleFont: { size: 14 },
+          bodyFont: { size: 13 },
+          displayColors: false,
           callbacks: {
             title: items => items[0].label,
             label: ctx => {
@@ -307,8 +312,14 @@ function showAnalysis(id) {
               const firstDay = 1;
               const lastDay = new Date(year, i + 1, 0).getDate();
               
+              // Форматируем цену без дробной части
+              const formattedPrice = price.toLocaleString('ru-RU', {
+                maximumFractionDigits: 0,
+                minimumFractionDigits: 0
+              });
+              
               return [
-                `Цена: ${price} ₽`,
+                `Цена: ${formattedPrice} ₽`,
                 `Период: ${firstDay}-${lastDay} ${monthNamesGenitive[i]}`
               ];
             }
@@ -328,12 +339,7 @@ function showAnalysis(id) {
   });
 }
 
-
-
-
-
-
-// для свайперов
+// ======= ОБРАБОТКА ТЕКСТА ДЛЯ СВАЙПЕРОВ =======
 function lowerAfterFirstWord(str) {
   return str.replace(/^\s*(\S+)/, (m, w) =>
       w[0].toUpperCase() + w.slice(1).toLowerCase()

@@ -568,10 +568,16 @@ section{
 }
 
 .chartjs-tooltip {
-  white-space: nowrap;
-  max-width: 180px;
-  font-size: 1em;
-  z-index: 100;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.chartjs-tooltip-active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 .footer{
