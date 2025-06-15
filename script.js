@@ -235,7 +235,7 @@ function renderParts(arr) {
   });
 }
 
-// ======= АНАЛИЗ СПРОСА =======
+// ======= АНАЛИЗ ЦЕНЫ =======
 function showAnalysis(id) {
   const part = partsData.find(p => String(p.id) === String(id));
   const container = document.getElementById('analysis-' + id);
@@ -260,49 +260,42 @@ function showAnalysis(id) {
   `;
   container.style.display = 'block';
 
+  // Не скрываем график автоматически!
+
   if (container._chart) container._chart.destroy();
   const ctx = document.getElementById(`chart-${id}`).getContext('2d');
   container._chart = new Chart(ctx, {
     type: 'line',
     data: {
       labels: monthNames,
-      datasets: [
-        {
-          label: 'Продажи, шт.',
-          data: sales,
-          borderColor: '#22c55e',
-          backgroundColor: 'rgba(34,197,94,0.08)',
-          tension: 0.24,
-          fill: true,
-          pointRadius: 3,
-          yAxisID: 'y',
-        },
-        {
-          label: 'Цена, ₽',
-          data: prices,
-          borderColor: '#facc15',
-          backgroundColor: 'rgba(250,204,21,0.12)',
-          tension: 0.18,
-          fill: false,
-          pointRadius: 3,
-          yAxisID: 'y1',
-        }
-      ]
+      datasets: [{
+        label: 'Продажи, шт.',
+        data: sales,
+        borderColor: '#22c55e',
+        backgroundColor: 'rgba(34,197,94,0.08)',
+        tension: 0.24,
+        fill: true,
+        pointRadius: 4
+      }]
     },
     options: {
       responsive: false,
       plugins: {
-        legend: { display: true },
+        legend: { display: false },
         tooltip: {
           enabled: true,
           callbacks: {
+            title: function(ctx) {
+              return ctx[0].label; // месяц
+            },
             label: function(context) {
-              if (context.dataset.label === 'Продажи, шт.') {
-                return `Продажи: ${context.parsed.y} шт.`;
-              } else if (context.dataset.label === 'Цена, ₽') {
-                return `Цена: ${context.parsed.y} ₽`;
-              }
-              return '';
+              const i = context.dataIndex;
+              const prod = sales[i];
+              const price = prices[i];
+              return [
+                `Продажи: ${prod} шт.`,
+                `Цена: ${price} ₽`
+              ];
             }
           }
         }
@@ -310,22 +303,15 @@ function showAnalysis(id) {
       scales: {
         y: {
           beginAtZero: true,
-          title: { display: true, text: 'Продажи' },
-          position: 'left',
+          title: { display: true, text: 'Продажи' }
         },
-        y1: {
-          beginAtZero: false,
-          title: { display: true, text: 'Цена' },
-          position: 'right',
-          grid: { drawOnChartArea: false }
-        },
-        x: { title: { display: true, text: 'Месяц' } }
+        x: {
+          title: { display: true, text: 'Месяц' }
+        }
       }
     }
   });
 }
-
-
 
 function lowerAfterFirstWord(str) {
   return str.replace(/^\s*(\S+)/, (m, w) =>
