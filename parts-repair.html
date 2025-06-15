@@ -112,30 +112,34 @@ function populateFilters(){
   brSel.innerHTML  = brands.map(v=>`<option value="${v}">${v==='all'?'Все бренды':v}</option>`).join('');
 }
 
-function filterItems(){
-  const cat  = category-select.value;
-  const br   = brand-select.value;
-  const stk  = stock-select.value;
-  const sort = sort-select.value;
+function filterItems () {
+  // ─── читаем выбранные значения из <select> ───
+  const cat  = document.getElementById('category-select').value;
+  const br   = document.getElementById('brand-select').value;
+  const stk  = document.getElementById('stock-select').value;
+  const sort = document.getElementById('sort-select').value;
 
+  // ─── копия данных ───
   let items = partsData.slice();
 
-  if (cat!=='all') items = items.filter(p=>p.category===cat);
-  if (br!=='all')  items = items.filter(p=>p.brand===br);
+  // ─── фильтры ───
+  if (cat !== 'all') items = items.filter(p => p.category === cat);
+  if (br  !== 'all') items = items.filter(p => p.brand    === br);
 
-  if (stk==='in-stock')      items = items.filter(p=>p.stock>10);
-  else if (stk==='low-stock')items = items.filter(p=>p.stock>0&&p.stock<=10);
-  else if (stk==='out-of-stock') items = items.filter(p=>p.stock===0);
+  if (stk === 'in-stock')          items = items.filter(p => p.stock > 10);
+  else if (stk === 'low-stock')    items = items.filter(p => p.stock > 0 && p.stock <= 10);
+  else if (stk === 'out-of-stock') items = items.filter(p => p.stock === 0);
 
-  if (sort!=='default'){
-    const fn = {
-      'price-asc':  (a,b)=>a.price-b.price,
-      'price-desc': (a,b)=>b.price-a.price,
-      'name-asc':   (a,b)=>a.name.localeCompare(b.name),
-      'name-desc':  (a,b)=>b.name.localeCompare(a.name)
-    }[sort];
-    items.sort(fn);
-  }
+  // ─── сортировка ───
+  const cmp = {
+    'price-asc':  (a, b) => a.price - b.price,
+    'price-desc': (a, b) => b.price - a.price,
+    'name-asc':   (a, b) => a.name.localeCompare(b.name),
+    'name-desc':  (a, b) => b.name.localeCompare(a.name),
+    'default':    () => 0
+  }[sort];
+
+  items.sort(cmp);
   renderParts(items);
 }
 
