@@ -261,28 +261,38 @@ function showAnalysis(id) {
   if (container._chart) container._chart.destroy();
   const ctx = document.getElementById(`chart-${id}`).getContext('2d');
   container._chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: monthNames,
-      datasets: [{
-        label: 'Продажи, шт.',
-        data: sales,
-        borderColor: '#22c55e',
-        backgroundColor: 'rgba(34,197,94,0.08)',
-        tension: 0.24,
-        fill: true,
-        pointRadius: 3
-      }]
-    },
-    options: {
-      responsive: false,
-      plugins: { legend: { display: false }},
-      scales: {
-        y: { beginAtZero: true, title: { display: true, text: 'Продажи' } },
-        x: { title: { display: true, text: 'Месяц' } }
+  type: 'line',
+  data: {
+    labels: monthNames,
+    datasets: [{
+      label: 'Продажи, шт.',
+      data: sales,
+      borderColor: '#22c55e',
+      backgroundColor: 'rgba(34,197,94,0.08)',
+      tension: 0.24,
+      fill: true,
+      pointRadius: 3
+    }]
+  },
+  options: {
+    responsive: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        enabled: true,
+        callbacks: {
+          label: function(context) {
+            return `Продажи, шт: ${context.parsed.y}`;
+          }
+        }
       }
+    },
+    scales: {
+      y: { beginAtZero: true, title: { display: true, text: 'Продажи' } },
+      x: { title: { display: true, text: 'Месяц' } }
     }
-  });
+  }
+});
 }
 
 function lowerAfterFirstWord(str) {
