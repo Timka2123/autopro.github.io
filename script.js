@@ -248,9 +248,7 @@ function showAnalysis(id) {
   const validMonths = sales.filter(x => x > 0);
   const avg = validMonths.length ? validMonths.reduce((a,b)=>a+b,0) / validMonths.length : 0;
 
-  // Для сезонности если avg = 0 — показывать "-"
   const seasonality = sales.map(x => avg ? (x/avg).toFixed(2) : "-");
-  // Для прогноза: если сезонность 0 — берём просто среднее, если нет — по формуле
   const nextMonth = (new Date().getMonth() + 1) % 12;
   const forecast = (avg && seasonality[nextMonth] !== "-") ? Math.round(avg * seasonality[nextMonth]) : Math.round(avg);
 
@@ -266,66 +264,59 @@ function showAnalysis(id) {
   `;
   container.style.display = 'block';
 
-  // Custom Tooltip (точный месяц, fade-out)
- function customTooltip(context) {
-  const tooltipEl = document.getElementById(`custom-tooltip-${id}`);
-  const chart = context.chart;
-  const tooltip = context.tooltip;
-  if (!tooltipEl || !tooltip || !tooltip.dataPoints?.length) return;
+  // Кастомный tooltip
+  function customTooltip(context) {
+    const tooltipEl = document.getElementById(`custom-tooltip-${id}`);
+    const chart = context.chart;
+    const tooltip = context.tooltip;
+    if (!tooltipEl || !tooltip || !tooltip.dataPoints?.length) return;
 
-  if (tooltip.opacity === 0) {
-    tooltipEl.style.opacity = 0;
-    tooltipEl.style.display = 'none';
-    return;
+    if (tooltip.opacity === 0) {
+      tooltipEl.style.opacity = 0;
+      tooltipEl.style.display = 'none';
+      return;
+    }
+
+    const i = tooltip.dataPoints[0].dataIndex;
+    const month = monthNames[i];
+    const prod = sales[i];
+    const price = prices[i];
+
+    tooltipEl.innerHTML = `
+      <div style="padding:0.4em 1em;">
+        <b>${month}</b><br>
+        <span>Продажи: <b>${prod}</b> шт.</span><br>
+        <span>Цена: <b>${price}</b> ₽</span>
+      </div>
+    `;
+
+    tooltipEl.style.display = 'block';
+    tooltipEl.style.opacity = 1;
+    tooltipEl.style.position = 'absolute';
+    tooltipEl.style.pointerEvents = 'none';
+    tooltipEl.style.background = 'rgba(34,34,34,0.98)';
+    tooltipEl.style.color = '#facc15';
+    tooltipEl.style.borderRadius = '7px';
+    tooltipEl.style.fontSize = '1em';
+    tooltipEl.style.transition = 'opacity 0.5s';
+    tooltipEl.style.zIndex = 100;
+    tooltipEl.style.minWidth = '130px';
+
+    // === Позиция: прям возле точки ===
+    // context.tooltip.caretX/Y — координаты внутри canvas!
+    const canvasRect = chart.canvas.getBoundingClientRect();
+    const parentRect = chart.canvas.parentNode.getBoundingClientRect();
+    // Корректируем, чтобы работало в любом layout
+    let left = chart.canvas.offsetLeft + tooltip.caretX - (tooltipEl.offsetWidth || 80) / 2;
+    let top = chart.canvas.offsetTop + tooltip.caretY - 45;
+
+    // чтобы не вылезало за край
+    left = Math.max(8, Math.min(left, chart.width + chart.canvas.offsetLeft - (tooltipEl.offsetWidth || 140)));
+    tooltipEl.style.left = left + 'px';
+    tooltipEl.style.top = top + 'px';
   }
 
-  const i = tooltip.dataPoints[0].dataIndex;
-  const month = monthNames[i];
-  const prod = sales[i];
-  const price = prices[i];
-
-  tooltipEl.innerHTML = `
-    <div style="padding:0.4em 0.9em;">
-      <b>${month}</b><br>
-      <span>Продажи: <b>${prod}</b> шт.</span><br>
-      <span>Цена: <b>${price}</b> ₽</span>
-    </div>
-  `;
-
-  tooltipEl.style.display = 'block';
-  tooltipEl.style.opacity = 1;
-  tooltipEl.style.position = 'absolute';
-  tooltipEl.style.pointerEvents = 'none';
-  tooltipEl.style.background = 'rgba(34,34,34,0.98)';
-  tooltipEl.style.color = '#facc15';
-  tooltipEl.style.borderRadius = '7px';
-  tooltipEl.style.fontSize = '1em';
-  tooltipEl.style.transition = 'opacity 0.5s';
-  tooltipEl.style.zIndex = 100;
-  tooltipEl.style.minWidth = '135px';
-
-  // === Позиционирование: не вылезать за правый/левый край ===
-  const chartRect = chart.canvas.getBoundingClientRect();
-  const parentRect = chart.canvas.parentNode.getBoundingClientRect();
-  const canvasOffsetLeft = chart.canvas.offsetLeft;
-  const canvasOffsetTop = chart.canvas.offsetTop;
-  const tooltipWidth = tooltipEl.offsetWidth || 150;
-
-  let left = canvasOffsetLeft + tooltip.caretX + 16;
-  let top  = canvasOffsetTop + tooltip.caretY - 36;
-
-  // Если tooltip вылезает за правый край — показать слева от точки
-  if (left + tooltipWidth > chart.width + canvasOffsetLeft) {
-    left = canvasOffsetLeft + tooltip.caretX - tooltipWidth - 16;
-  }
-  // Если tooltip вылезает за левый край — поправить
-  if (left < 0) left = 10;
-
-  tooltipEl.style.left = left + 'px';
-  tooltipEl.style.top  = top + 'px';
-}
-
-
+  // Создаем график
   if (container._chart) container._chart.destroy();
   const ctx = document.getElementById(`chart-${id}`).getContext('2d');
   container._chart = new Chart(ctx, {
@@ -336,11 +327,11 @@ function showAnalysis(id) {
         label: 'Продажи, шт.',
         data: sales,
         borderColor: '#22c55e',
-        backgroundColor: 'rgba(34,197,94,0.08)',
-        tension: 0,              // Без сглаживания
+        backgroundColor: 'rgba(34,197,94,0.09)',
+        tension: 0,              // Без сглаживания!
         fill: true,
-        pointRadius: 5,
-        pointHoverRadius: 8,
+        pointRadius: 8,
+        pointHoverRadius: 13,
         pointBackgroundColor: '#facc15',
         pointBorderColor: '#22c55e'
       }]
@@ -351,14 +342,14 @@ function showAnalysis(id) {
         legend: { display: false },
         tooltip: {
           enabled: false, // Отключаем стандартный тултип
-          mode: 'index',
-          intersect: false,
+          mode: 'nearest',
+          intersect: true,
           external: customTooltip
         }
       },
       interaction: {
         mode: 'nearest',
-        intersect: false
+        intersect: true // Только если мышка прямо на точке!
       },
       scales: {
         y: {
@@ -372,7 +363,7 @@ function showAnalysis(id) {
     }
   });
 
-  // Fade out on mouse leave (анимация исчезновения)
+  // Анимация исчезновения tooltip при mouseleave
   const chartCanvas = document.getElementById(`chart-${id}`);
   chartCanvas.addEventListener('mouseleave', () => {
     const tooltipEl = document.getElementById(`custom-tooltip-${id}`);
@@ -384,6 +375,7 @@ function showAnalysis(id) {
     }
   });
 }
+
 
 
 
