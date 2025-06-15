@@ -154,6 +154,7 @@ function renderParts(arr) {
     box.innerHTML = '<div class="no-results"><i class="fas fa-search"></i><h3>Ничего не найдено</h3></div>';
     return;
   }
+
   box.innerHTML = arr.map(p => {
     // --- статус/бейдж ---
     let badge = '', stockTxt = '', stockClass = '';
@@ -168,13 +169,14 @@ function renderParts(arr) {
       stars += i <= full ? '<i class="fas fa-star"></i>' :
         i === full + 1 && half ? '<i class="fas fa-star-half-alt"></i>' : '<i class="far fa-star"></i>';
 
-    // --- проверка цены ---
+    // --- только цифра цены! ---
     let priceClass = '';
     const oldPrice = prevPrices.get(p.id);
     if (oldPrice !== undefined && oldPrice !== p.price) {
       priceClass = p.price > oldPrice ? 'price-up' : 'price-down';
     }
 
+    // добавим placeholder для toast (всплывающая подсказка)
     return `
       <div class="item" data-id="${p.id}">
         ${badge}
@@ -182,7 +184,10 @@ function renderParts(arr) {
         <img src="${p.img}" alt="${p.name}">
         <h3>${p.name}</h3>
         <div class="category" data-category="${p.category}">${p.category}</div>
-        <div class="price ${priceClass}">${p.price.toLocaleString('ru-RU')} ₽</div>
+        <div class="price ${priceClass}">
+          <span class="price-value">${p.price.toLocaleString('ru-RU')}</span> <span>₽</span>
+        </div>
+        <div class="toast-hint" id="toast-${p.id}"></div>
         <p>${p.description || ''}</p>
         <div class="stock ${stockClass}">${stockTxt}</div>
         <div class="rating">${stars} <span>${p.rating}</span></div>
@@ -190,15 +195,40 @@ function renderParts(arr) {
     `;
   }).join('');
 
-  // Удаляем классы подсветки после анимации
+  // После отрисовки: обработка анимации и всплывашки
   arr.forEach(p => {
-    if (!prevPrices.has(p.id)) return;
-    const item = document.querySelector(`.item[data-id="${p.id}"] .price`);
-    if (item) {
-      setTimeout(() => item.classList.remove('price-up', 'price-down'), 1600);
+    const itemEl  = document.querySelector(`.item[data-id="${p.id}"]`);
+    const priceEl = itemEl?.querySelector('.price');
+    const valueEl = itemEl?.querySelector('.price-value');
+    const toastEl = itemEl?.querySelector('.toast-hint');
+    const old = prevPrices.get(p.id);
+
+    if (old !== undefined && old !== p.price) {
+      // Класс для анимации
+      priceEl?.classList.remove('price-up','price-down');
+      void priceEl?.offsetWidth; // restart animation
+      if (p.price > old) priceEl?.classList.add('price-up');
+      else               priceEl?.classList.add('price-down');
+
+      // Текст всплывашки
+      let delta = Math.abs(p.price - old).toLocaleString('ru-RU');
+      toastEl.textContent =
+        p.price > old
+          ? `Цена увеличилась на ${delta} ₽`
+          : `Цена снижена на ${delta} ₽`;
+
+      toastEl.classList.add('show');
+      setTimeout(() => {
+        toastEl.classList.remove('show');
+        priceEl?.classList.remove('price-up','price-down');
+      }, 1800);
     }
+    // обновляем значения для дальнейших сравнений
+    prevPrices.set(p.id, p.price);
   });
 }
+</script>
+
 </script>
 
 

@@ -1262,16 +1262,44 @@ section{
     border: 1px solid #2ecc71;
 }
 
-@keyframes priceUp {
-  0%   { background: #22c55e; color: #fff; }
-  80%  { background: #22c55e; color: #fff; }
-  100% { background: transparent; color: inherit; }
+@keyframes priceFlashUp {
+  0%   { color: #22c55e; }
+  50%  { color: #16a34a; }
+  100% { color: inherit; }
 }
-@keyframes priceDown {
-  0%   { background: #ef4444; color: #fff; }
-  80%  { background: #ef4444; color: #fff; }
-  100% { background: transparent; color: inherit; }
+@keyframes priceFlashDown {
+  0%   { color: #ef4444; }
+  50%  { color: #b91c1c; }
+  100% { color: inherit; }
 }
 
-.price-up   { animation: priceUp   1.5s ease; }
-.price-down { animation: priceDown 1.5s ease; }
+.price-up .price-value {
+  animation: priceFlashUp 1.2s cubic-bezier(.4,0,.2,1);
+  transition: color 0.5s;
+}
+.price-down .price-value {
+  animation: priceFlashDown 1.2s cubic-bezier(.4,0,.2,1);
+  transition: color 0.5s;
+}
+
+.toast-hint {
+  position: absolute;
+  left: 50%;
+  top: -2.3em;
+  transform: translateX(-50%);
+  background: rgba(50, 50, 50, 0.97);
+  color: #fff;
+  padding: 0.4em 1.2em;
+  border-radius: 1em;
+  font-size: 1em;
+  box-shadow: 0 2px 10px #0002;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 100;
+}
+.toast-hint.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.item { position: relative; }
