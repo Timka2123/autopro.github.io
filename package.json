@@ -1,6 +1,11 @@
 {
-  "name": "auto-update",
+  "name": "autopro",
   "version": "1.0.0",
   "type": "module",
-  "scripts": { "update": "node scripts/fetch-products.js" }
+  "scripts": {
+    "update": "node fetch-products.js"
+  },
+  "dependencies": {
+    "node-fetch": "^3.4.4"
+  }
 }

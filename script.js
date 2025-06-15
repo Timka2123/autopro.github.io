@@ -235,3 +235,54 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   });
 });
+
+/* глобальное меню + эффекты, взято из вашего оригинала */
+
+let menu   = document.querySelector('#menu-btn');
+
+
+menu.onclick = () => {
+  menu.classList.toggle('fa-times');
+  navbar.classList.toggle('active');
+};
+
+document.querySelector('#login-btn').onclick = () =>
+  document.querySelector('.login-form-container').classList.toggle('active');
+
+document.querySelector('#close-login-form').onclick = () =>
+  document.querySelector('.login-form-container').classList.remove('active');
+
+window.onscroll = () => {
+  menu.classList.remove('fa-times');
+  navbar.classList.remove('active');
+  document.querySelector('.header')
+          .classList.toggle('active', window.scrollY > 0);
+};
+
+/* параллакс главного баннера */
+const home = document.querySelector('.home');
+home?.addEventListener('mousemove', e => {
+  document.querySelectorAll('.home-parallax').forEach(el => {
+    const speed = el.dataset.speed;
+    el.style.transform = `translateX(${(window.innerHeight - e.pageY * speed) / 90}px)
+                          translateY(${(window.innerWidth  - e.pageX * speed) / 90}px)`;
+  });
+});
+home?.addEventListener('mouseleave', () => {
+  document.querySelectorAll('.home-parallax')
+          .forEach(el => el.style.transform = 'translateX(0) translateY(0)');
+});
+
+/* Swiper-слайдеры */
+const swiperOpts = {
+  grabCursor: true,
+  centeredSlides: true,
+  spaceBetween: 20,
+  loop: true,
+  autoplay: { delay: 9_500, disableOnInteraction: false },
+  pagination: { el: '.swiper-pagination', clickable: true },
+  breakpoints: { 0:{slidesPerView:1},768:{slidesPerView:2},1024:{slidesPerView:3} }
+};
+new Swiper('.vehicles-slider',  swiperOpts);
+new Swiper('.featured-slider',  swiperOpts);
+new Swiper('.review-slider',    swiperOpts);

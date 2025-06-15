@@ -2,207 +2,180 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- Стили -->
-  <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="style.css">
-  
   <title>Каталог запчастей</title>
 </head>
 <body>
 
-  <!-- Шапка -->
-  <header class="header active">
-    <div id="menu-btn" class="fas fa-bars"></div>
-    <a href="index.html" class="logo"> <span>авто</span>Партс </a>
-    <nav class="navbar">
-      <a href="index.html#home">домашняя</a>
-      <a href="index.html#vehicles">автомобили</a>
-      <a href="index.html#services">сервисы</a>
-      <a href="index.html#featured">рекомендуемое</a>
-      <a href="index.html#reviews">отзывы</a>
-      <a href="index.html#contact">контакт</a>
-    </nav>
-    <div id="login-btn">
-      <button class="btn">вход</button>
-      <i class="far fa-user"></i>
+<header class="header active">
+  <div id="menu-btn" class="fas fa-bars"></div>
+  <a href="index.html" class="logo"><span>авто</span>Партс</a>
+  <nav class="navbar">
+    <a href="index.html#home">домашняя</a>
+    <a href="index.html#vehicles">автомобили</a>
+    <a href="index.html#services">сервисы</a>
+    <a href="index.html#featured">рекомендуемое</a>
+    <a href="index.html#reviews">отзывы</a>
+    <a href="index.html#contact">контакт</a>
+  </nav>
+  <div id="login-btn"><button class="btn">вход</button><i class="far fa-user"></i></div>
+</header>
+
+<section class="parts-repair">
+  <h1 class="heading">Каталог <span>запчастей</span></h1>
+
+  <!-- ФИЛЬТРЫ -->
+  <div class="filters-container">
+    <div class="filter-box">
+      <h3>Категория</h3>
+      <select id="category-select"><option value="all">Все категории</option></select>
     </div>
-  </header>
-
-  <!-- Контент -->
-  <section class="parts-repair">
-    <h1 class="heading">Каталог <span>запчастей</span></h1>
-
-    <div class="filters-container">
-      <div class="filter-box">
-        <h3>Категория</h3>
-        <select id="category-select">
-          <option value="all">Все категории</option>
-        </select>
-      </div>
-      <div class="filter-box">
-        <h3>Бренд</h3>
-        <select id="brand-select">
-          <option value="all">Все бренды</option>
-        </select>
-      </div>
-      <div class="filter-box">
-        <h3>Наличие</h3>
-        <select id="stock-select">
-          <option value="all">Все товары</option>
-          <option value="in-stock">В наличии</option>
-          <option value="low-stock">Мало на складе</option>
-          <option value="out-of-stock">Нет в наличии</option>
-        </select>
-      </div>
-      <div class="filter-box">
-        <h3>Сортировка</h3>
-        <select id="sort-select">
-          <option value="default">По умолчанию</option>
-          <option value="price-asc">Цена: по возрастанию</option>
-          <option value="price-desc">Цена: по убыванию</option>
-          <option value="name-asc">Название: А→Я</option>
-          <option value="name-desc">Название: Я→А</option>
-        </select>
-      </div>
-      <button class="btn filter-btn" onclick="filterItems()">Применить</button>
+    <div class="filter-box">
+      <h3>Бренд</h3>
+      <select id="brand-select"><option value="all">Все бренды</option></select>
     </div>
-
-    <div class="catalog" id="parts-catalog">
-      <!-- Карточки запчастей будут вставляться сюда -->
+    <div class="filter-box">
+      <h3>Наличие</h3>
+      <select id="stock-select">
+        <option value="all">Все товары</option>
+        <option value="in-stock">В наличии</option>
+        <option value="low-stock">Мало на складе</option>
+        <option value="out-of-stock">Нет в наличии</option>
+      </select>
     </div>
-  </section>
+    <div class="filter-box">
+      <h3>Сортировка</h3>
+      <select id="sort-select">
+        <option value="default">По умолчанию</option>
+        <option value="price-asc">Цена ↑</option>
+        <option value="price-desc">Цена ↓</option>
+        <option value="name-asc">Название А→Я</option>
+        <option value="name-desc">Название Я→А</option>
+      </select>
+    </div>
+    <button class="btn filter-btn" onclick="filterItems()">Применить</button>
+  </div>
 
-  <!-- Скрипты: сначала Swiper для слайдеров, потом наш основной код -->
-  <script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"></script>
-  <script>
-    // ====== НАСТРОЙКИ ======
-    const REFRESH_MS = 5 * 60_000;  // 5 минут
+  <div class="catalog" id="parts-catalog"></div>
+</section>
 
-    // ====== ГЛОБАЛЫ ======
-    let partsData    = [];          // текущий массив запчастей
-    let lastDataHash = null;        // строковое сравнение, чтобы не рисовать без надобности
+<script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"></script>
+<script>
+/* ====== НАСТРОЙКИ ====== */
+const REFRESH_MS = 30_000;          // 30 секунд
 
-    // ====== ПЕРВЫЙ ЗАПУСК И ТАЙМЕР ======
-    document.addEventListener('DOMContentLoaded', () => {
-      loadJsonAndRender();
-      setInterval(loadJsonAndRender, REFRESH_MS);
-    });
+/* ====== ГЛОБАЛЬНЫЕ ДАННЫЕ ====== */
+let partsData    = [];
+let lastDigest   = null;
 
-    // ====== ЗАГРУЗКА JSON + РЕНДЕР ======
-    async function loadJsonAndRender() {
-      try {
-        const resp = await fetch(`export_fixed.json?ts=${Date.now()}`);
-        const data = await resp.json();
+/* ====== ПЕРВЫЙ ЗАПУСК И ТАЙМЕР ====== */
+document.addEventListener('DOMContentLoaded', () => {
+  loadJsonAndRender();
+  setInterval(loadJsonAndRender, REFRESH_MS);
+  document.addEventListener('visibilitychange', () => !document.hidden && loadJsonAndRender());
+});
 
-        const hash = JSON.stringify(data);
-        if (hash === lastDataHash) return;
-        lastDataHash = hash;
+/* ====== ЗАГРУЗКА И ПЕРЕРИСОВКА ====== */
+async function loadJsonAndRender(){
+  try{
+    const res  = await fetch(`export_fixed.json?ts=${Date.now()}`,{cache:'no-store'});
+    const data = await res.json();
 
-        partsData = data.map(d => ({
-          ...d,
-          // если некоторых полей нет, можете дефолтно их заполнить:
-          rating:   d.rating ?? (Math.random()*1+4).toFixed(1),
-          img:      d.img    ?? `image/part-${Math.floor(Math.random()*6)+1}.png`
-        }));
+    const digest = JSON.stringify(data.map(p=>[p.id,p.price,p.stock]));
+    if (digest === lastDigest) return;               // файл не менялся
+    lastDigest = digest;
 
-        populateFilters();
-        filterItems();
-        console.log('catalog updated at', new Date().toLocaleTimeString());
-      } catch(err) {
-        console.error('Не удалось загрузить export_fixed.json:', err);
-      }
-    }
+    partsData = data.map(p=>({
+      ...p,
+      rating: p.rating ?? (Math.random()*1+4).toFixed(1),
+      img:    p.img    ?? `image/part-${Math.floor(Math.random()*6)+1}.png`
+    }));
 
-    // ====== ЗАПОЛНЕНИЕ ВЫПАДАЮЩИХ СПИСКОВ ======
-    function populateFilters() {
-      const cats   = ['all', ...new Set(partsData.map(p=>p.category))];
-      const brands = ['all', ...new Set(partsData.map(p=>p.brand))];
+    populateFilters();
+    filterItems();
+    console.log('[catalog] updated',new Date().toLocaleTimeString());
+  }catch(e){console.error('JSON load error',e);}
+}
 
-      const catSel   = document.getElementById('category-select');
-      const brandSel = document.getElementById('brand-select');
-      catSel.innerHTML   = cats.map(v => `<option value="${v}">${v==='all'? 'Все категории' : v}</option>`).join('');
-      brandSel.innerHTML = brands.map(v=> `<option value="${v}">${v==='all'? 'Все бренды' : v}</option>`).join('');
-    }
+/* ====== ФИЛЬТРЫ ====== */
+function populateFilters(){
+  const cats   = ['all',...new Set(partsData.map(p=>p.category))];
+  const brands = ['all',...new Set(partsData.map(p=>p.brand))];
 
-    // ====== ФИЛЬТРАЦИЯ И СОРТИРОВКА ======
-    function filterItems() {
-      const cat   = document.getElementById('category-select').value;
-      const br    = document.getElementById('brand-select').value;
-      const stk   = document.getElementById('stock-select').value;
-      const sort  = document.getElementById('sort-select').value;
+  const catSel = document.getElementById('category-select');
+  const brSel  = document.getElementById('brand-select');
 
-      let filtered = partsData.slice();
-      if (cat   !== 'all') filtered = filtered.filter(p=>p.category===cat);
-      if (br    !== 'all') filtered = filtered.filter(p=>p.brand===br);
-      if (stk   === 'in-stock')    filtered = filtered.filter(p=>p.stock>10);
-      if (stk   === 'low-stock')   filtered = filtered.filter(p=>p.stock>0&&p.stock<=10);
-      if (stk   === 'out-of-stock')filtered = filtered.filter(p=>p.stock===0);
+  catSel.innerHTML = cats.map(v=>`<option value="${v}">${v==='all'?'Все категории':v}</option>`).join('');
+  brSel.innerHTML  = brands.map(v=>`<option value="${v}">${v==='all'?'Все бренды':v}</option>`).join('');
+}
 
-      if (sort !== 'default') {
-        filtered.sort((a,b)=>{
-          switch(sort){
-            case 'price-asc':  return a.price - b.price;
-            case 'price-desc': return b.price - a.price;
-            case 'name-asc':   return a.name.localeCompare(b.name);
-            case 'name-desc':  return b.name.localeCompare(a.name);
-          }
-        });
-      }
-      renderParts(filtered);
-    }
+function filterItems(){
+  const cat  = category-select.value;
+  const br   = brand-select.value;
+  const stk  = stock-select.value;
+  const sort = sort-select.value;
 
-    // ====== ОТОБРАЖЕНИЕ КАРТОЧЕК ======
-    function renderParts(items) {
-      const container = document.getElementById('parts-catalog');
-      container.innerHTML = '';
+  let items = partsData.slice();
 
-      if (items.length === 0) {
-        container.innerHTML = `
-          <div class="no-results">
-            <i class="fas fa-search"></i>
-            <h3>Ничего не найдено</h3>
-            <p>Попробуйте другие параметры фильтрации.</p>
-          </div>`;
-        return;
-      }
+  if (cat!=='all') items = items.filter(p=>p.category===cat);
+  if (br!=='all')  items = items.filter(p=>p.brand===br);
 
-      items.forEach(p => {
-        // статус и бейдж
-        let stockText = '', badge = '';
-        if (p.stock > 10) {
-          stockText = 'В наличии'; badge = '<span class="badge new">NEW</span>';
-        } else if (p.stock > 0) {
-          stockText = `Мало (${p.stock})`; badge = '<span class="badge sale">SALE</span>';
-        } else {
-          stockText = 'Нет в наличии'; badge = '<span class="badge out">OUT</span>';
-        }
+  if (stk==='in-stock')      items = items.filter(p=>p.stock>10);
+  else if (stk==='low-stock')items = items.filter(p=>p.stock>0&&p.stock<=10);
+  else if (stk==='out-of-stock') items = items.filter(p=>p.stock===0);
 
-        // рейтинг
-        const fullStars = Math.floor(p.rating),
-              halfStar  = p.rating % 1 >= 0.5;
-        let stars = '';
-        for (let i=1; i<=5; i++){
-          if      (i<=fullStars)                stars += '<i class="fas fa-star"></i>';
-          else if (i===fullStars+1 && halfStar) stars += '<i class="fas fa-star-half-alt"></i>';
-          else                                  stars += '<i class="far fa-star"></i>';
-        }
+  if (sort!=='default'){
+    const fn = {
+      'price-asc':  (a,b)=>a.price-b.price,
+      'price-desc': (a,b)=>b.price-a.price,
+      'name-asc':   (a,b)=>a.name.localeCompare(b.name),
+      'name-desc':  (a,b)=>b.name.localeCompare(a.name)
+    }[sort];
+    items.sort(fn);
+  }
+  renderParts(items);
+}
 
-        container.insertAdjacentHTML('beforeend', `
-          <div class="item">
-            ${badge}
-            <img src="${p.img}" alt="${p.name}">
-            <h3>${p.name}</h3>
-            <p class="price">${p.price.toLocaleString()} ₽</p>
-            <p class="category">${p.category}</p>
-            <p class="stock">${stockText}</p>
-            <div class="rating">${stars}</div>
-          </div>`);
-      });
-    }
-  </script>
+/* ====== РЕНДЕР КАРТОЧЕК ====== */
+function renderParts(arr){
+  const box = document.getElementById('parts-catalog');
+  if (!arr.length){
+    box.innerHTML =
+      '<div class="no-results"><i class="fas fa-search"></i><h3>Ничего не найдено</h3></div>';
+    return;
+  }
+  box.innerHTML = arr.map(p=>{
+    /* бейдж + статус */
+    let badge   = '', stockTxt = '';
+    if (p.stock>10){ stockTxt='В наличии';           badge='<span class="badge new">NEW</span>'; }
+    else if (p.stock>0){ stockTxt=`Мало (${p.stock})`;badge='<span class="badge sale">SALE</span>'; }
+    else { stockTxt='Нет в наличии';                 badge='<span class="badge out">OUT</span>'; }
+
+    /* звёздочки */
+    const full = Math.floor(p.rating), half = p.rating%1>=0.5;
+    let stars = '';
+    for(let i=1;i<=5;i++)
+      stars += i<=full ? '<i class="fas fa-star"></i>' :
+               i===full+1 && half ? '<i class="fas fa-star-half-alt"></i>' :
+               '<i class="far fa-star"></i>';
+
+    return `
+      <div class="item">
+        ${badge}
+        <img src="${p.img}" alt="${p.name}">
+        <h3>${p.name}</h3>
+        <p class="price">${p.price.toLocaleString()} ₽</p>
+        <p class="category">${p.category}</p>
+        <p class="stock">${stockTxt}</p>
+        <div class="rating">${stars}</div>
+      </div>`;
+  }).join('');
+}
+</script>
+
+<script src="script.js"></script>
 </body>
 </html>
