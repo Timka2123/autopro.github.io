@@ -207,7 +207,7 @@ section{
 .home h3{
     color:var(--black);
     font-size: 7.5vw;
-    text-transform: uppercase;
+    text-transform: none;
 }
 
 .home img{
