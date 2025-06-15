@@ -244,16 +244,21 @@ function showAnalysis(id) {
   const sales = Array.isArray(part.sold) && part.sold.length === 12 ? part.sold : Array(12).fill(0);
   const prices = Array.isArray(part.currency) && part.currency.length === 12 ? part.currency : Array(12).fill(part.price);
 
-  const avg = sales.reduce((a,b)=>a+b,0)/sales.length || 1;
-  const seasonality = sales.map(x => (x/avg).toFixed(2));
+  // Среднее только по месяцам где продажи > 0
+  const validMonths = sales.filter(x => x > 0);
+  const avg = validMonths.length ? validMonths.reduce((a,b)=>a+b,0) / validMonths.length : 0;
+
+  // Для сезонности если avg = 0 — показывать "-"
+  const seasonality = sales.map(x => avg ? (x/avg).toFixed(2) : "-");
+  // Для прогноза: если сезонность 0 — берём просто среднее, если нет — по формуле
   const nextMonth = (new Date().getMonth() + 1) % 12;
-  const forecast = Math.round(avg * seasonality[nextMonth]);
+  const forecast = (avg && seasonality[nextMonth] !== "-") ? Math.round(avg * seasonality[nextMonth]) : Math.round(avg);
 
   container.innerHTML = `
     <div style="font-size:1.1em;margin-bottom:0.5em;"><b>История цен:</b></div>
     <canvas id="chart-${id}" width="440" height="190" style="max-width:100%;display:block"></canvas>
     <div style="margin-top:0.5em;">
-      <span>Средний спрос: <b>${avg.toFixed(1)}</b> шт/мес</span><br>
+      <span>Средний спрос: <b>${avg ? avg.toFixed(1) : "-"}</b> шт/мес</span><br>
       <span>Сезонный коэффициент (${monthNames[nextMonth]}): <b>${seasonality[nextMonth]}</b></span><br>
       <span>Прогноз на ${monthNames[nextMonth]}: <b>${forecast}</b> шт</span>
     </div>
@@ -261,12 +266,12 @@ function showAnalysis(id) {
   `;
   container.style.display = 'block';
 
-  // Custom Tooltip (fade out)
+  // Custom Tooltip (точный месяц, fade-out)
   function customTooltip(context) {
     const tooltipEl = document.getElementById(`custom-tooltip-${id}`);
     const chart = context.chart;
     const tooltip = context.tooltip;
-    if (!tooltipEl || !tooltip) return;
+    if (!tooltipEl || !tooltip || !tooltip.dataPoints?.length) return;
 
     if (tooltip.opacity === 0) {
       tooltipEl.style.opacity = 0;
@@ -312,9 +317,12 @@ function showAnalysis(id) {
         data: sales,
         borderColor: '#22c55e',
         backgroundColor: 'rgba(34,197,94,0.08)',
-        tension: 0.24,
+        tension: 0,              // Без сглаживания
         fill: true,
-        pointRadius: 4
+        pointRadius: 5,
+        pointHoverRadius: 8,
+        pointBackgroundColor: '#facc15',
+        pointBorderColor: '#22c55e'
       }]
     },
     options: {
@@ -356,6 +364,7 @@ function showAnalysis(id) {
     }
   });
 }
+
 
 
 function lowerAfterFirstWord(str) {
