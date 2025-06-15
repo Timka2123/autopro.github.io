@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Каталог запчастей</title>
+</head>
+<body>
+    <header class="header active">
+        <div id="menu-btn" class="fas fa-bars"></div>
+        <a href="index.html" class="logo"> <span>авто</span>Партс </a>
+        <nav class="navbar">
+            <a href="index.html#home">домашняя</a>
+            <a href="index.html#vehicles">автомобили</a>
+            <a href="index.html#services">сервисы</a>
+            <a href="index.html#featured">рекомендуемое</a>
+            <a href="index.html#reviews">отзывы</a>
+            <a href="index.html#contact">контакт</a>
+        </nav>
+        <div id="login-btn">
+            <button class="btn">вход</button>
+            <i class="far fa-user"></i>
+        </div>
+    </header>
+    
+    <section class="parts-repair">
+        <h1 class="heading"> Каталог <span>запчастей</span> </h1>
+      
+        <div class="filters-container">
+            <!-- Фильтр по категории -->
+            <div class="filter-box">
+                <h3>Категория</h3>
+                <select id="category-select">
+                    <option value="all">Все категории</option>
+                    <!-- Категории будут загружены динамически -->
+                </select>
+            </div>
+            
+            <!-- Фильтр по бренду -->
+            <div class="filter-box">
+                <h3>Бренд</h3>
+                <select id="brand-select">
+                    <option value="all">Все бренды</option>
+                    <!-- Бренды будут загружены динамически -->
+                </select>
+            </div>
+            
+            <!-- Фильтр по наличию -->
+            <div class="filter-box">
+                <h3>Наличие</h3>
+                <select id="stock-select">
+                    <option value="all">Все товары</option>
+                    <option value="in-stock">В наличии</option>
+                    <option value="low-stock">Мало на складе</option>
+                    <option value="out-of-stock">Нет в наличии</option>
+                </select>
+            </div>
+            
+            <!-- Сортировка -->
+            <div class="filter-box">
+                <h3>Сортировка</h3>
+                <select id="sort-select">
+                    <option value="default">По умолчанию</option>
+                    <option value="price-asc">Цена: по возрастанию</option>
+                    <option value="price-desc">Цена: по убыванию</option>
+                    <option value="name-asc">Название: А-Я</option>
+                    <option value="name-desc">Название: Я-А</option>
+                </select>
+            </div>
+            
+            <button class="btn filter-btn" onclick="filterItems()">Применить фильтры</button>
+        </div>
+      
+        <div class="catalog" id="parts-catalog">
+            <!-- Запчасти будут загружены здесь -->
+        </div>
+    </section>
+    
+    <!-- Подключаем Chart.js для графиков -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // Глобальная переменная для данных
+        let partsData = [];
+
+        // Загрузка данных при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('export_fixed.json')
+                .then(response => response.json())
+                .then(data => {
+                    // Добавляем недостающие поля
+                    data.forEach(part => {
+                        // Рейтинг
+                        if (!part.rating) {
+                            part.rating = (Math.random() * 1 + 4).toFixed(1); // от 4.0 до 5.0
+                        }
+                        // Изображение (если отсутствует)
+                        if (!part.img) {
+                            part.img = `image/part-${Math.floor(Math.random() * 6) + 1}.png`;
+                        }
+                    });
+                    
+                    partsData = data;
+                    
+                    // Заполняем фильтры категорий и брендов
+                    populateFilters();
+                    
+                    // Отображаем товары
+                    filterItems();
+                })
+                .catch(error => {
+                    console.error('Ошибка загрузки данных:', error);
+                    document.getElementById('parts-catalog').innerHTML = `
+                        <div class="no-results">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h3>Ошибка загрузки данных</h3>
+                            <p>Попробуйте обновить страницу позже</p>
+                        </div>
+                    `;
+                });
+        });
+
+        // Функция для заполнения фильтров
+        function populateFilters() {
+            const categorySelect = document.getElementById('category-select');
+            const brandSelect = document.getElementById('brand-select');
+            
+            // Получаем уникальные категории
+            const categories = [...new Set(partsData.map(part => part.category))];
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            });
+            
+            // Получаем уникальные бренды
+            const brands = [...new Set(partsData.map(part => part.brand))];
+            brands.forEach(brand => {
+                const option = document.createElement('option');
+                option.value = brand;
+                option.textContent = brand;
+                brandSelect.appendChild(option);
+            });
+        }
+
+        // Функция отображения запчастей с добавлением анализа
+        function renderParts(items) {
+            const container = document.getElementById('parts-catalog');
+            container.innerHTML = '';
+            
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <h3>Ничего не найдено</h3>
+                        <p>Попробуйте изменить параметры фильтрации</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            items.forEach(part => {
+                // Определяем статус наличия
+                let stockStatus = '';
+                let stockClass = '';
+                let badge = '';
+                
+                if (part.stock > 10) {
+                    stockStatus = 'В наличии';
+                    stockClass = 'in-stock';
+                    badge = '<span class="badge new">NEW</span>';
+                } else if (part.stock > 0) {
+                    stockStatus = `Мало (${part.stock} шт.)`;
+                    stockClass = 'low-stock';
+                    badge = '<span class="badge sale">SALE</span>';
+                } else {
+                    stockStatus = 'Нет в наличии';
+                    stockClass = 'out-of-stock';
+                    badge = '<span class="badge out">OUT</span>';
+                }
+                
+                // Формируем звезды рейтинга
+                let starsHtml = '';
+                const fullStars = Math.floor(part.rating);
+                const hasHalfStar = part.rating % 1 >= 0.5;
+                
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= fullStars) {
+                        starsHtml += '<i class="fas fa-star"></i>';
+                    } else if (i === fullStars + 1 && hasHalfStar) {
+                        starsHtml += '<i class="fas fa-star-half-alt"></i>';
+                    } else {
+                        starsHtml += '<i class="far fa-star"></i>';
+                    }
+                }
+                
+                container.innerHTML += `
+                    <div class="item" id="part-${part.id}">
+                        ${badge}
+                        <div class="brand-logo">${part.brand.toUpperCase()}</div>
+                        <img src="${part.img}" alt="${part.name}">
+                        <h3>${part.name}</h3>
+                        <div class="meta">
+                            <div class="category">${part.category}</div>
+                            <div class="rating">${starsHtml} <span>${part.rating}</span></div>
+                        </div>
+                        <p>${part.description}</p>
+                        
+                        <div class="price-stock">
+                            <div class="price">${part.price.toLocaleString('ru-RU')} руб.</div>
+                            <div class="stock ${stockClass}">${stockStatus}</div>
+                        </div>
+                        
+                        <button class="btn" ${part.stock == 0 ? 'disabled' : ''}>
+                            ${part.stock > 0 ? '<i class="fas fa-shopping-cart"></i> В корзину' : 'Нет в наличии'}
+                        </button>
+                        
+                        <div class="actions">
+                            <a href="#"><i class="far fa-heart"></i> В избранное</a>
+                            <a href="#"><i class="fas fa-exchange-alt"></i> Сравнить</a>
+                        </div>
+                        
+                        <div class="analysis-tooltip">
+                            <div class="analysis-content">
+                                <h4>Анализ спроса</h4>
+                                <div class="chart-container">
+                                    <canvas class="demand-chart"></canvas>
+                                </div>
+                                <div class="analysis-stats">
+                                    <div class="stat"><span>Средние продажи:</span> <span class="value" id="avg-${part.id}"></span></div>
+                                    <div class="stat"><span>Сезонный коэффициент:</span> <span class="value" id="season-${part.id}"></span></div>
+                                    <div class="stat"><span>Влияние курса:</span> <span class="value" id="currency-${part.id}"></span></div>
+                                    <div class="stat"><span>Прогноз спроса:</span> <span class="value forecast" id="forecast-${part.id}"></span></div>
+                                    <div class="recommendation" id="recommendation-${part.id}"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Инициализируем анализ для каждого товара
+            items.forEach(part => {
+                analyzeSalesTrends(part);
+            });
+        }
+
+        // Функция анализа продаж и построения прогноза
+        function analyzeSalesTrends(part) {
+            if (!part.sold || part.sold.length === 0) return;
+            
+            // 1. Рассчитываем средние продажи
+            const totalSales = part.sold.reduce((sum, qty) => sum + qty, 0);
+            const avgSales = totalSales / part.sold.length;
+            document.getElementById(`avg-${part.id}`).textContent = avgSales.toFixed(1) + ' шт/мес';
+            
+            // 2. Определяем сезонный коэффициент
+            const currentMonth = new Date().getMonth() + 1;
+            const isTOSession = (currentMonth >= 3 && currentMonth <= 5) || (currentMonth >= 9 && currentMonth <= 11);
+            const seasonFactor = isTOSession ? 1.4 : 0.8;
+            document.getElementById(`season-${part.id}`).textContent = seasonFactor.toFixed(2);
+            
+            // 3. Генерируем случайные данные о курсе валют
+            let baseRate = 75;
+            let currencyRates = [baseRate];
+            for (let i = 1; i < part.sold.length; i++) {
+                let change = (Math.random() * 6) - 3; // от -3 до 3
+                currencyRates.push(currencyRates[i-1] + change);
+            }
+            
+            // 4. Анализируем влияние курса валют
+            const currencyChanges = [];
+            for (let i = 1; i < currencyRates.length; i++) {
+                const change = ((currencyRates[i] - currencyRates[i-1]) / currencyRates[i-1]) * 100;
+                currencyChanges.push(change);
+            }
+            const avgCurrencyChange = currencyChanges.reduce((sum, change) => sum + change, 0) / currencyChanges.length;
+            const currencyImpact = avgCurrencyChange > 0 ? 0.9 : 1.1;
+            document.getElementById(`currency-${part.id}`).textContent = 
+                (avgCurrencyChange > 0 ? '+' : '') + avgCurrencyChange.toFixed(1) + '%';
+            
+            // 5. Рассчитываем прогноз спроса
+            const forecast = avgSales * seasonFactor * currencyImpact;
+            document.getElementById(`forecast-${part.id}`).textContent = forecast.toFixed(1) + ' шт';
+            
+            // 6. Формируем рекомендации
+            const recommendation = document.getElementById(`recommendation-${part.id}`);
+            if (part.stock === 0) {
+                recommendation.innerHTML = '<div class="warning">⚠ Требуется срочное пополнение запасов!</div>';
+            } else if (part.stock < forecast) {
+                recommendation.innerHTML = `<div class="warning">⚠ Рекомендуется пополнить запас на ${Math.ceil(forecast - part.stock)} шт</div>`;
+            } else {
+                recommendation.innerHTML = '<div class="success">✓ Запасы достаточны</div>';
+            }
+            
+            // 7. Строим график продаж
+            renderSalesChart(part, part.sold, currencyRates);
+        }
+
+        // Функция построения графика продаж
+        function renderSalesChart(part, sales, currencyRates) {
+            const canvas = document.querySelector(`#part-${part.id} .demand-chart`);
+            if (!canvas) return;
+            
+            const months = sales.map((_, index) => `Месяц ${index+1}`);
+            
+            // Уничтожаем предыдущий график если существует
+            if (canvas.chart) {
+                canvas.chart.destroy();
+            }
+            
+            canvas.chart = new Chart(canvas, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Продажи (шт)',
+                            data: sales,
+                            borderColor: 'rgb(75, 192, 192)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            yAxisID: 'y',
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Курс валюты',
+                            data: currencyRates,
+                            borderColor: 'rgb(255, 99, 132)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            yAxisID: 'y1',
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Продажи'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Курс'
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Функция фильтрации и сортировки
+        function filterItems() {
+            const category = document.getElementById('category-select').value;
+            const brand = document.getElementById('brand-select').value;
+            const stock = document.getElementById('stock-select').value;
+            const sort = document.getElementById('sort-select').value;
+            
+            // Фильтрация
+            let filtered = partsData;
+            
+            if (category !== 'all') {
+                filtered = filtered.filter(p => p.category === category);
+            }
+            
+            if (brand !== 'all') {
+                filtered = filtered.filter(p => p.brand === brand);
+            }
+            
+            if (stock !== 'all') {
+                if (stock === 'in-stock') {
+                    filtered = filtered.filter(p => p.stock > 10);
+                } else if (stock === 'low-stock') {
+                    filtered = filtered.filter(p => p.stock > 0 && p.stock <= 10);
+                } else if (stock === 'out-of-stock') {
+                    filtered = filtered.filter(p => p.stock === 0);
+                }
+            }
+            
+            // Сортировка
+            if (sort !== 'default') {
+                filtered.sort((a, b) => {
+                    switch (sort) {
+                        case 'price-asc':
+                            return a.price - b.price;
+                        case 'price-desc':
+                            return b.price - a.price;
+                        case 'name-asc':
+                            return a.name.localeCompare(b.name);
+                        case 'name-desc':
+                            return b.name.localeCompare(a.name);
+                        default:
+                            return 0;
+                    }
+                });
+            }
+            
+            renderParts(filtered);
+        }
+    </script>
+    
+    <script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"></script>
+</body>
+</html>
