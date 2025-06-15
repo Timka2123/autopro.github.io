@@ -55,14 +55,13 @@ const baseOpts = {
   }
 };
 
-if (document.querySelector('.vehicles-slider') || 
-    document.querySelector('.featured-slider') || 
-    document.querySelector('.review-slider')) {
-  // Подключать Swiper только если есть нужный блок
-  new Swiper('.vehicles-slider', baseOpts);
-  new Swiper('.featured-slider', baseOpts);
-  new Swiper('.review-slider',   baseOpts);
-}
+try {
+  if (typeof Swiper !== 'undefined') {
+    new Swiper('.vehicles-slider', baseOpts);
+    new Swiper('.featured-slider', baseOpts);
+    new Swiper('.review-slider',   baseOpts);
+  }
+} catch(e) {}
 
 // ======= ГЛОБАЛЬНЫЕ ДАННЫЕ =======
 let partsData = [];
