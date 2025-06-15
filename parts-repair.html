@@ -68,6 +68,81 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+
+let partsData = [];
+let prevPrices = new Map();
+const REFRESH_MS = 30000; // как часто обновлять (мс)
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadAndRender();
+  setInterval(loadAndRender, REFRESH_MS);
+  document.addEventListener('visibilitychange', () => !document.hidden && loadAndRender());
+});
+
+function loadAndRender() {
+  fetch('export_fixed.json?ts=' + Date.now(), { cache: 'no-store' })
+    .then(res => res.json())
+    .then(data => {
+      partsData = data;
+      renderParts(partsData);
+      // Заполняем фильтры категориями/брендами
+      populateFilters();
+    })
+    .catch(err => {
+      document.getElementById('parts-catalog').innerHTML = '<div class="no-results"><i class="fas fa-exclamation-triangle"></i><h3>Ошибка загрузки данных</h3></div>';
+      console.error('Ошибка загрузки JSON:', err);
+    });
+}
+
+// Автоматически заполнять фильтры категориями и брендами из данных
+function populateFilters() {
+  const categorySelect = document.getElementById('category-select');
+  const brandSelect = document.getElementById('brand-select');
+  // Сохраняем выбранные значения (чтобы не сбивались при обновлении)
+  const catValue = categorySelect.value;
+  const brValue  = brandSelect.value;
+
+  categorySelect.innerHTML = '<option value="all">Все категории</option>';
+  brandSelect.innerHTML = '<option value="all">Все бренды</option>';
+  [...new Set(partsData.map(p => p.category))].forEach(cat => {
+    categorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+  });
+  [...new Set(partsData.map(p => p.brand))].forEach(br => {
+    brandSelect.innerHTML += `<option value="${br}">${br}</option>`;
+  });
+
+  categorySelect.value = catValue;
+  brandSelect.value    = brValue;
+}
+
+// Функция для фильтрации товаров (при нажатии кнопки "Применить")
+function filterItems() {
+  const cat  = document.getElementById('category-select').value;
+  const br   = document.getElementById('brand-select').value;
+  const stk  = document.getElementById('stock-select').value;
+  const sort = document.getElementById('sort-select').value;
+
+  let items = partsData.slice();
+  if (cat !== 'all') items = items.filter(p => p.category === cat);
+  if (br  !== 'all') items = items.filter(p => p.brand    === br);
+
+  if (stk === 'in-stock')          items = items.filter(p => p.stock > 10);
+  else if (stk === 'low-stock')    items = items.filter(p => p.stock > 0 && p.stock <= 10);
+  else if (stk === 'out-of-stock') items = items.filter(p => p.stock === 0);
+
+  if (sort !== 'default') {
+    const cmp = {
+      'price-asc':  (a, b) => a.price - b.price,
+      'price-desc': (a, b) => b.price - a.price,
+      'name-asc':   (a, b) => a.name.localeCompare(b.name),
+      'name-desc':  (a, b) => b.name.localeCompare(a.name),
+    }[sort];
+    items.sort(cmp);
+  }
+  renderParts(items);
+}
+</script>
+
 const updatedProducts = new Set();
 const monthNames = [
   'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
