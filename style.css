@@ -1282,6 +1282,26 @@ section{
   transition: color 0.5s;
 }
 
+.price-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  margin-left: 0.3em;
+  font-size: 1em;
+  background: #333c;
+  color: #ffe600;
+  border-radius: 1em;
+  padding: 0.08em 0.5em 0.08em 0.35em;
+  animation: fadeInScale 0.2s;
+  position: relative;
+  top: -0.2em;
+}
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.7);}
+  to   { opacity: 1; transform: scale(1);}
+}
+.price-flag.hide { display: none; }
+
 .toast-hint {
   position: absolute;
   left: 50%;
@@ -1303,3 +1323,4 @@ section{
   pointer-events: auto;
 }
 .item { position: relative; }
+

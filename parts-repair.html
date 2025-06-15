@@ -147,7 +147,17 @@ function filterItems() {
   renderParts(items);
 }
 
-// Сама отрисовка карточек + подсветка цены
+
+function toSentenceCase(str) {
+  if (!str) return '';
+  return str[0].toUpperCase() + str.slice(1).toLowerCase();
+}
+function lowerAfterFirst(str) {
+  // Делает все слова после первого — с маленькой буквы (и после ":")
+  return str.replace(/([А-ЯA-ZЁ])[А-ЯA-ZЁа-яa-zё0-9\-]*/g, (word, p1, offset) =>
+    offset === 0 ? word : word[0].toLowerCase() + word.slice(1)
+  );
+}
 function renderParts(arr) {
   const box = document.getElementById('parts-catalog');
   if (!arr.length) {
@@ -156,27 +166,27 @@ function renderParts(arr) {
   }
 
   box.innerHTML = arr.map(p => {
-    // --- статус/бейдж ---
     let badge = '', stockTxt = '', stockClass = '';
     if (p.stock > 10)      { stockTxt = 'В наличии';        badge = '<span class="badge new">NEW</span>'; stockClass = 'in-stock'; }
     else if (p.stock > 0)  { stockTxt = `Мало (${p.stock})`; badge = '<span class="badge sale">SALE</span>'; stockClass = 'low-stock'; }
     else                   { stockTxt = 'Нет в наличии';    badge = '<span class="badge out">OUT</span>';  stockClass = 'out-of-stock'; }
 
-    // --- рейтинг ---
     const full = Math.floor(p.rating), half = p.rating % 1 >= 0.5;
     let stars = '';
     for (let i = 1; i <= 5; i++)
       stars += i <= full ? '<i class="fas fa-star"></i>' :
         i === full + 1 && half ? '<i class="fas fa-star-half-alt"></i>' : '<i class="far fa-star"></i>';
 
-    // --- только цифра цены! ---
     let priceClass = '';
     const oldPrice = prevPrices.get(p.id);
+    let flag = '';
     if (oldPrice !== undefined && oldPrice !== p.price) {
       priceClass = p.price > oldPrice ? 'price-up' : 'price-down';
+      flag = `<span class="price-flag">
+        <i class="fas fa-sync-alt" style="font-size:.95em;"></i> Обновлено
+      </span>`;
     }
 
-    // добавим placeholder для toast (всплывающая подсказка)
     return `
       <div class="item" data-id="${p.id}">
         ${badge}
@@ -186,6 +196,7 @@ function renderParts(arr) {
         <div class="category" data-category="${p.category}">${p.category}</div>
         <div class="price ${priceClass}">
           <span class="price-value">${p.price.toLocaleString('ru-RU')}</span> <span>₽</span>
+          ${flag}
         </div>
         <div class="toast-hint" id="toast-${p.id}"></div>
         <p>${p.description || ''}</p>
@@ -199,35 +210,39 @@ function renderParts(arr) {
   arr.forEach(p => {
     const itemEl  = document.querySelector(`.item[data-id="${p.id}"]`);
     const priceEl = itemEl?.querySelector('.price');
+    const flagEl  = itemEl?.querySelector('.price-flag');
     const valueEl = itemEl?.querySelector('.price-value');
     const toastEl = itemEl?.querySelector('.toast-hint');
     const old = prevPrices.get(p.id);
 
     if (old !== undefined && old !== p.price) {
-      // Класс для анимации
       priceEl?.classList.remove('price-up','price-down');
-      void priceEl?.offsetWidth; // restart animation
+      void priceEl?.offsetWidth;
       if (p.price > old) priceEl?.classList.add('price-up');
       else               priceEl?.classList.add('price-down');
-
-      // Текст всплывашки
+      // -------- Всплывашка --------
       let delta = Math.abs(p.price - old).toLocaleString('ru-RU');
-      toastEl.textContent =
-        p.price > old
-          ? `Цена увеличилась на ${delta} ₽`
-          : `Цена снижена на ${delta} ₽`;
-
+      let toast = p.price > old
+        ? `Цена увеличилась на ${delta} ₽`
+        : `Цена снижена на ${delta} ₽`;
+      toast = lowerAfterFirst(toast); // после первого слова — всё с маленькой буквы
+      toastEl.textContent = toast;
       toastEl.classList.add('show');
+      flagEl?.classList.remove('hide');
       setTimeout(() => {
         toastEl.classList.remove('show');
         priceEl?.classList.remove('price-up','price-down');
+        flagEl?.classList.add('hide');
       }, 1800);
+    } else if (flagEl) {
+      // скрываем флаг, если цена не изменилась
+      flagEl.classList.add('hide');
     }
-    // обновляем значения для дальнейших сравнений
     prevPrices.set(p.id, p.price);
   });
 }
 </script>
+
 
 </script>
 
