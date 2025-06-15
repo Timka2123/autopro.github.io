@@ -55,9 +55,14 @@ const baseOpts = {
   }
 };
 
-new Swiper('.vehicles-slider', baseOpts);
-new Swiper('.featured-slider', baseOpts);
-new Swiper('.review-slider',   baseOpts);
+if (document.querySelector('.vehicles-slider') || 
+    document.querySelector('.featured-slider') || 
+    document.querySelector('.review-slider')) {
+  // Подключать Swiper только если есть нужный блок
+  new Swiper('.vehicles-slider', baseOpts);
+  new Swiper('.featured-slider', baseOpts);
+  new Swiper('.review-slider',   baseOpts);
+}
 
 // ======= ГЛОБАЛЬНЫЕ ДАННЫЕ =======
 let partsData = [];
