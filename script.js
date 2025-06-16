@@ -240,159 +240,74 @@ function renderParts(arr) {
 }
 
 
-// ======= АНАЛИЗ ЦЕНЫ =======
 function showAnalysis(id) {
-  const part = partsData.find(p => String(p.id) === String(id));
-  const container = document.getElementById('analysis-' + id);
-  if (!part || !container) return;
 
-  const sales = Array.isArray(part.sold) && part.sold.length === 12 ? part.sold : Array(12).fill(0);
-  const prices = Array.isArray(part.currency) && part.currency.length === 12 ? part.currency : Array(12).fill(part.price);
+  const part = partsData.find(p=>String(p.id)===String(id));
+  const container = document.getElementById('analysis-'+id);
+  if (!part||!container) return;
 
-  // Среднее только по месяцам где продажи > 0
-  const validMonths = sales.filter(x => x > 0);
-  const avg = validMonths.length ? validMonths.reduce((a,b)=>a+b,0) / validMonths.length : 0;
+  const sales = Array.isArray(part.sold)&&part.sold.length===12?part.sold:Array(12).fill(0);
+  const prices=Array.isArray(part.currency)&&part.currency.length===12?part.currency:Array(12).fill(part.price);
 
-  const seasonality = sales.map(x => avg ? (x/avg).toFixed(2) : "-");
-  const nextMonth = (new Date().getMonth() + 1) % 12;
-  const forecast = (avg && seasonality[nextMonth] !== "-") ? Math.round(avg * seasonality[nextMonth]) : Math.round(avg);
+  const validMonths = sales.filter(x=>x>0);
+  const avg = validMonths.length?validMonths.reduce((a,b)=>a+b,0)/validMonths.length:0;
+  const seasonality = sales.map(x=>avg?(x/avg).toFixed(2):'-');
+  const nextMonth = (new Date().getMonth()+1)%12;
+  const forecast = (avg&&seasonality[nextMonth]!=='-')?Math.round(avg*seasonality[nextMonth]):Math.round(avg);
+
+  // Сохраняем коэффициент и прогноз в data-атрибутах элемента .item
+  const seasonalCoefficient = seasonality[nextMonth];
+  const forecastNextMonth = forecast;
+  const itemEl = document.querySelector(`.item[data-id="${id}"]`);
+  if (itemEl) {
+    itemEl.dataset.seasonalCoefficient = seasonalCoefficient;
+    itemEl.dataset.forecastNextMonth = forecastNextMonth;
+  }
 
   container.innerHTML = `
     <div style="font-size:1.1em;margin-bottom:0.5em;"><b>История цен:</b></div>
-    <div class="chart-container">
-      <canvas id="chart-${id}"></canvas>
-    </div>
+    <div class="chart-container"><canvas id="chart-${id}"></canvas></div>
     <div style="margin-top:0.5em;">
-      <span>Средний спрос: <b>${avg ? avg.toFixed(1) : "-"}</b> шт/мес</span><br>
+      <span>Средний спрос: <b>${avg?avg.toFixed(1):'-'}</b> шт/мес</span><br>
       <span>Сезонный коэффициент (${monthNames[nextMonth]}): <b>${seasonality[nextMonth]}</b></span><br>
       <span>Прогноз на ${monthNames[nextMonth]}: <b>${forecast}</b> шт</span>
-    </div>
-  `;
-  container.style.display = 'block';
+    </div>`;
 
+  container.style.display='block';
   if (container._chart) container._chart.destroy();
-  
+
   const ctx = document.getElementById(`chart-${id}`).getContext('2d');
-  
-  // Рассчитываем размеры контейнера
-  const containerWidth = container.clientWidth;
-  const responsiveHeight = Math.max(200, containerWidth * 0.4);
-  
-  container._chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: monthNames,
-      datasets: [{
-        label: 'Цена, ₽',
-        data: prices,
-        borderColor: '#f9d806',
-        backgroundColor: 'rgba(249, 216, 6, 0.1)',
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: '#130f40',
-        pointBorderColor: '#fff',
-        pointRadius: 5,
-        pointHoverRadius: 8,
-        pointBorderWidth: 2,
-        pointHoverBorderWidth: 2
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          enabled: true,
-          mode: 'index',
-          intersect: false,
-          backgroundColor: 'rgba(19, 15, 64, 0.9)',
-          padding: 12,
-          borderColor: '#f9d806',
-          borderWidth: 1,
-          cornerRadius: 8,
-          titleFont: { size: 16, weight: 'bold' },
-          bodyFont: { size: 14 },
-          displayColors: false,
-          callbacks: {
-            title: items => {
-              return `${monthNames[items[0].dataIndex]}`;
-            },
-            label: ctx => {
-              const i = ctx.dataIndex;
-              const price = prices[i];
-              
-              const year = new Date().getFullYear();
-              const firstDay = 1;
-              const lastDay = new Date(year, i + 1, 0).getDate();
-              
-              const formattedPrice = price.toLocaleString('ru-RU', {
-                maximumFractionDigits: 0,
-                minimumFractionDigits: 0
-              });
-              
-              return [
-                `Цена: ${formattedPrice} ₽`,
-                `Период: ${firstDay}-${lastDay} ${monthNamesGenitive[i]} ${year}`
-              ];
-            }
+  container._chart = new Chart(ctx,{
+    type:'line',
+    data:{labels:monthNames,datasets:[{label:'Цена, ₽',data:prices,fill:true,tension:0.4,
+      borderColor:'#f9d806',backgroundColor:'rgba(249,216,6,0.1)',
+      pointBackgroundColor:'#130f40',pointBorderColor:'#fff',pointRadius:5,pointHoverRadius:8,pointBorderWidth:2,pointHoverBorderWidth:2
+    }]}
+    ,
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{enabled:true,mode:'index',intersect:false,
+        backgroundColor:'rgba(19,15,64,0.9)',padding:12,borderColor:'#f9d806',borderWidth:1,cornerRadius:8,
+        titleFont:{size:16,weight:'bold'},bodyFont:{size:14},displayColors:false,
+        callbacks:{
+          title:items=>monthNames[items[0].dataIndex],
+          label:ctx=>{
+            const i=ctx.dataIndex;const price=prices[i];
+            const year=new Date().getFullYear();const firstDay=1;
+            const lastDay=new Date(year,i+1,0).getDate();
+            return [
+              `Цена: ${price.toLocaleString('ru-RU')} ₽`,
+              `Период: ${firstDay}-${lastDay} ${monthNamesGenitive[i]} ${year}`
+            ];
           }
         }
+      }},
+      scales:{x:{title:{display:true,text:'Месяц',font:{size:14,weight:'bold'}},grid:{display:false,drawBorder:true},ticks:{font:{size:12},maxRotation:45,minRotation:45}},
+      y:{title:{display:true,text:'Цена, ₽',font:{size:14,weight:'bold'}},beginAtZero:false,grid:{color:'rgba(0,0,0,0.05)',drawBorder:false},ticks:{padding:10,callback:v=>v.toLocaleString('ru-RU')+' ₽',font:{size:12}}}
       },
-      scales: {
-        x: {
-          title: { 
-            display: true, 
-            text: 'Месяц',
-            font: { size: 14, weight: 'bold' }
-          },
-          grid: {
-            display: false,
-            drawBorder: true
-          },
-          ticks: {
-            font: { size: 12 },
-            maxRotation: 45,
-            minRotation: 45
-          }
-        },
-        y: {
-          title: { 
-            display: true, 
-            text: 'Цена, ₽',
-            font: { size: 14, weight: 'bold' }
-          },
-          beginAtZero: false,
-          grid: {
-            color: 'rgba(0, 0, 0, 0.05)',
-            drawBorder: false
-          },
-          ticks: {
-            font: { size: 12 },
-            padding: 10,
-            callback: function(value) {
-              return value.toLocaleString('ru-RU') + ' ₽';
-            }
-          }
-        }
-      },
-      interaction: {
-        mode: 'nearest',
-        axis: 'x',
-        intersect: false
-      },
-      animation: {
-        duration: 300,
-        easing: 'easeOutQuart'
-      },
-      layout: {
-        padding: {
-          top: 20,
-          right: 20,
-          bottom: 20,
-          left: 20
-        }
-      }
+      interaction:{mode:'nearest',axis:'x',intersect:false},
+      animation:{duration:300,easing:'easeOutQuart'},
+      layout:{padding:{top:20,right:20,bottom:20,left:20}}
     }
   });
   
