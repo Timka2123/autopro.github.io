@@ -1361,14 +1361,15 @@ section{
 
 .analysis-container {
   overflow: hidden;
-  transition: opacity 0.35s, max-height 0.5s cubic-bezier(.5,1,.89,1);
   opacity: 1;
   max-height: 1000px;
+  transition: opacity 0.5s, max-height 0.7s cubic-bezier(.5,1,.89,1);
   will-change: opacity, max-height;
 }
 .analysis-container.closed {
   opacity: 0;
   max-height: 0;
-  transition: opacity 0.35s, max-height 0.5s cubic-bezier(.5,0,.89,0);
+  transition: opacity 0.5s, max-height 0.7s cubic-bezier(.5,0,.89,0);
   pointer-events: none;
 }
+

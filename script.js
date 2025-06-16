@@ -65,7 +65,6 @@ function lowerAfterFirstWord(str) {
     .replace(/(\s+)(\S+)/g, (m, s, w) => s + w.toLowerCase());
 }
 
-/* --- Загрузка данных и рендер --- */
 document.addEventListener('DOMContentLoaded', () => {
   loadAndRender();
   setInterval(loadAndRender, 30000);
@@ -86,7 +85,6 @@ function loadAndRender() {
     });
 }
 
-/* --- Каталог и анализ --- */
 function renderParts(arr) {
   const box = document.getElementById('parts-catalog');
   if (!arr.length) {
@@ -149,29 +147,66 @@ function renderParts(arr) {
     prevPrices.set(p.id, p.price);
   });
 
+  // --- Кнопка с анимацией и авто-закрытием ---
   document.querySelectorAll('.analysis-btn').forEach(btn => btn.addEventListener('click', function () {
     const id = btn.dataset.id;
     const container = document.getElementById('analysis-' + id);
+
+    // Очистка предыдущего таймера автозакрытия (если был)
+    if (container._closeTimer) {
+      clearTimeout(container._closeTimer);
+      container._closeTimer = null;
+    }
+
     if (container.style.display !== 'none' && !container.classList.contains('closed')) {
-      container.classList.add('closed');
-      setTimeout(() => {
-        container.style.display = 'none';
-        if (container._chart) {
-          container._chart.destroy();
-          container._chart = null;
-        }
-        container.innerHTML = '';
-      }, 420);
+      closeAnalysis(container);
     } else {
       showAnalysis(id);
-      setTimeout(() => {
-        container.classList.remove('closed');
-      }, 10);
+      setTimeout(() => container.classList.remove('closed'), 10);
+
+      // Автоматическое закрытие через 10 секунд неиспользования
+      setAnalysisAutoClose(container, btn);
     }
   }));
 }
 
-/* --- Анализ цены --- */
+// --- Автоматическое и мягкое закрытие анализа ---
+function setAnalysisAutoClose(container, btn) {
+  let lastActive = Date.now();
+
+  function resetTimer() {
+    lastActive = Date.now();
+    if (container._closeTimer) {
+      clearTimeout(container._closeTimer);
+    }
+    container._closeTimer = setTimeout(() => {
+      if (Date.now() - lastActive >= 10000) { // 10 сек
+        closeAnalysis(container);
+      }
+    }, 10000);
+  }
+
+  container.onmouseenter = resetTimer;
+  container.onmousemove  = resetTimer;
+  container.onmouseleave = resetTimer;
+  btn.onmouseenter = resetTimer;
+  btn.onmousemove  = resetTimer;
+  btn.onmouseleave = resetTimer;
+  resetTimer();
+}
+function closeAnalysis(container) {
+  container.classList.add('closed');
+  setTimeout(() => {
+    container.style.display = 'none';
+    if (container._chart) {
+      container._chart.destroy();
+      container._chart = null;
+    }
+    container.innerHTML = '';
+  }, 700);
+}
+
+// --- Анализ цены ---
 function showAnalysis(id) {
   const part = partsData.find(p => String(p.id) === String(id));
   const container = document.getElementById('analysis-' + id);
@@ -179,18 +214,15 @@ function showAnalysis(id) {
   container.classList.remove('closed');
   container.style.display = 'block';
 
-  // Гарантируем 12 месяцев (нули если нет данных)
   let sales = Array.isArray(part.sold) ? part.sold.slice(0, 12) : [];
   let prices = Array.isArray(part.currency) ? part.currency.slice(0, 12) : [];
   while (sales.length < 12) sales.push(0);
   while (prices.length < 12) prices.push(part.price);
 
-  // Текущий и следующий месяц
   const now = new Date();
   const currentMonth = now.getMonth();
   const nextMonth = (currentMonth + 1) % 12;
 
-  // Средний спрос только по прошедшим месяцам (до текущего)
   const monthsPassed = sales.slice(0, currentMonth + 1);
   const avg = monthsPassed.filter(x => x > 0).length
     ? monthsPassed.filter(x => x > 0).reduce((a, b) => a + b, 0) / monthsPassed.filter(x => x > 0).length
@@ -206,7 +238,6 @@ function showAnalysis(id) {
   }
   const forecast = (avg && seasonalCoefficient !== '-') ? Math.round(avg * parseFloat(seasonalCoefficient)) : 0;
 
-  // Сохраняем коэффициент и прогноз в data-атрибутах
   const itemEl = document.querySelector(`.item[data-id="${id}"]`);
   if (itemEl) {
     itemEl.dataset.seasonalCoefficient = seasonalCoefficient;
@@ -298,7 +329,6 @@ function showAnalysis(id) {
   setTimeout(() => container._chart?.resize(), 50);
 }
 
-/* --- Фильтры (если используешь) --- */
 function populateFilters() {
   const catSel = document.getElementById('category-select');
   const brSel  = document.getElementById('brand-select');
