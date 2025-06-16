@@ -1379,10 +1379,10 @@ section{
   gap: 2.2rem 2.6rem;
   align-items: flex-end;
   justify-content: flex-start;
-  margin-bottom: 30px;
-  background: #fff;
-  border-radius: 1rem;
-  box-shadow: var(--box-shadow);
+  margin: 0 0 30px 0;
+  background: #202020;
+  border-radius: 18px;
+  box-shadow: 0 6px 26px 0 rgba(0,0,0,0.20);
   padding: 2.2rem 2.5rem;
 }
 
@@ -1395,35 +1395,44 @@ section{
 
 .filter-group label {
   font-weight: 600;
-  color: #333;
+  color: #ffe27a;
   margin-bottom: 7px;
-  font-size: 1.2em;
-  letter-spacing: 0.02em;
+  font-size: 1.18em;
+  letter-spacing: 0.03em;
+  text-shadow: 0 1px 3px #0009;
 }
 
 .filter-group select {
-  padding: 12px 16px;
-  background: #f8f8f8;
-  color: #1a1a1a;
-  border-radius: 8px;
-  border: 1px solid #eee;
+  padding: 13px 16px;
+  background: #232323;
+  color: #ffe27a;
+  border-radius: 10px;
+  border: 1.5px solid #26251f;
   font-size: 1.13em;
   min-width: 155px;
   max-width: 250px;
   margin: 0;
-  transition: background 0.18s, border-color 0.18s;
+  transition: background 0.19s, border-color 0.19s, color 0.18s;
+  box-shadow: 0 2px 12px 0 #0003;
+  outline: none;
 }
 
 .filter-group select:focus {
-  background: #f3f8e3;
-  border-color: var(--yellow);
-  box-shadow: 0 0 0 2px #f9d80638;
+  background: #252315;
+  color: #fff6b0;
+  border-color: #f9d806;
+  box-shadow: 0 0 0 2px #f9d80650, 0 2px 12px 0 #0003;
+}
+
+.filter-group select option {
+  background: #232323;
+  color: #ffe27a;
 }
 
 @media (max-width: 900px) {
   .filters-bar {
     flex-direction: column;
-    gap: 16px 0;
+    gap: 18px 0;
     padding: 1.5rem 1rem;
   }
   .filter-group {
@@ -1437,3 +1446,4 @@ section{
     max-width: none;
   }
 }
+
