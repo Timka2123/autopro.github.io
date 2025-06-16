@@ -31,8 +31,7 @@ const parallaxs = document.querySelectorAll('.home-parallax');
 home?.addEventListener('mousemove', e => {
   parallaxs.forEach(el => {
     const speed = el.dataset.speed;
-    el.style.transform = `translateX(${(window.innerWidth  - e.pageX * speed) / 90}px)
-                          translateY(${(window.innerHeight - e.pageY * speed) / 90}px)`;
+    el.style.transform = `translateX(${(window.innerWidth  - e.pageX * speed) / 90}px) translateY(${(window.innerHeight - e.pageY * speed) / 90}px)`;
   });
 });
 
@@ -48,11 +47,7 @@ const baseOpts = {
   loop: true,
   autoplay: { delay: 9500, disableOnInteraction: false },
   pagination: { el: '.swiper-pagination', clickable: true },
-  breakpoints: {
-    0:   { slidesPerView: 1 },
-    768: { slidesPerView: 2 },
-    1024:{ slidesPerView: 3 }
-  }
+  breakpoints: { 0: { slidesPerView: 1 }, 768: { slidesPerView: 2 }, 1024:{ slidesPerView: 3 } }
 };
 
 try {
@@ -68,20 +63,14 @@ let partsData = [];
 let prevPrices = new Map();
 const REFRESH_MS = 30000;
 const updatedProducts = new Set();
-const monthNames = [
-  'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-  'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
-];
-const monthNamesGenitive = [
-  'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
-  'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
-];
+const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const monthNamesGenitive = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
 
 // ======= ФУНКЦИЯ: Первое слово с большой, остальные с маленькой =======
 function lowerAfterFirstWord(str) {
   return str
-    .replace(/^\S+/, w => w[0].toUpperCase() + w.slice(1).toLowerCase())
-    .replace(/(\s+)(\S+)/g, (m, space, w) => space + w.toLowerCase());
+    .replace(/^[^\s]+/, w => w[0].toUpperCase() + w.slice(1).toLowerCase())
+    .replace(/(\s+)(\S+)/g, (m, s, w) => s + w.toLowerCase());
 }
 
 // ======= ЗАГРУЗКА И АВТО-ОБНОВЛЕНИЕ =======
@@ -107,20 +96,16 @@ function loadAndRender() {
 
 // ======= ФИЛЬТРЫ =======
 function populateFilters() {
-  const categorySelect = document.getElementById('category-select');
-  const brandSelect = document.getElementById('brand-select');
-  const catValue = categorySelect.value;
-  const brValue  = brandSelect.value;
-  categorySelect.innerHTML = '<option value="all">Все категории</option>';
-  brandSelect.innerHTML = '<option value="all">Все бренды</option>';
-  [...new Set(partsData.map(p => p.category))].forEach(cat => {
-    categorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
-  });
-  [...new Set(partsData.map(p => p.brand))].forEach(br => {
-    brandSelect.innerHTML += `<option value="${br}">${br}</option>`;
-  });
-  categorySelect.value = catValue;
-  brandSelect.value    = brValue;
+  const catSel = document.getElementById('category-select');
+  const brSel  = document.getElementById('brand-select');
+  const catVal = catSel.value;
+  const brVal  = brSel.value;
+  catSel.innerHTML = '<option value="all">Все категории</option>';
+  brSel.innerHTML  = '<option value="all">Все бренды</option>';
+  [...new Set(partsData.map(p => p.category))].forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
+  [...new Set(partsData.map(p => p.brand))].forEach(b => brSel.innerHTML  += `<option value="${b}">${b}</option>`);
+  catSel.value = catVal;
+  brSel.value  = brVal;
 }
 
 // ======= ФИЛЬТРАЦИЯ =======
@@ -129,21 +114,18 @@ function filterItems() {
   const br   = document.getElementById('brand-select').value;
   const stk  = document.getElementById('stock-select').value;
   const sort = document.getElementById('sort-select').value;
-
   let items = partsData.slice();
   if (cat !== 'all') items = items.filter(p => p.category === cat);
   if (br  !== 'all') items = items.filter(p => p.brand    === br);
-
-  if (stk === 'in-stock')          items = items.filter(p => p.stock > 10);
-  else if (stk === 'low-stock')    items = items.filter(p => p.stock > 0 && p.stock <= 10);
+  if (stk === 'in-stock')      items = items.filter(p => p.stock > 10);
+  else if (stk === 'low-stock') items = items.filter(p => p.stock > 0 && p.stock <= 10);
   else if (stk === 'out-of-stock') items = items.filter(p => p.stock === 0);
-
   if (sort !== 'default') {
     const cmp = {
-      'price-asc':  (a, b) => a.price - b.price,
-      'price-desc': (a, b) => b.price - a.price,
-      'name-asc':   (a, b) => a.name.localeCompare(b.name),
-      'name-desc':  (a, b) => b.name.localeCompare(a.name),
+      'price-asc':  (a,b)=>a.price-b.price,
+      'price-desc': (a,b)=>b.price-a.price,
+      'name-asc':   (a,b)=>a.name.localeCompare(b.name),
+      'name-desc':  (a,b)=>b.name.localeCompare(a.name)
     }[sort];
     items.sort(cmp);
   }
@@ -157,31 +139,21 @@ function renderParts(arr) {
     box.innerHTML = '<div class="no-results"><i class="fas fa-search"></i><h3>Ничего не найдено</h3></div>';
     return;
   }
-
   box.innerHTML = arr.map(p => {
-    let badge = '', stockTxt = '', stockClass = '';
-    if (p.stock > 10)      { stockTxt = 'В наличии';        badge = '<span class="badge new">NEW</span>'; stockClass = 'in-stock'; }
-    else if (p.stock > 0)  { stockTxt = `Мало (${p.stock})`; badge = '<span class="badge sale">SALE</span>'; stockClass = 'low-stock'; }
-    else                   { stockTxt = 'Нет в наличии';    badge = '<span class="badge out">OUT</span>';  stockClass = 'out-of-stock'; }
-
-    const full = Math.floor(p.rating), half = p.rating % 1 >= 0.5;
-    let stars = '';
-    for (let i = 1; i <= 5; i++)
-      stars += i <= full ? '<i class="fas fa-star"></i>' :
-        i === full + 1 && half ? '<i class="fas fa-star-half-alt"></i>' : '<i class="far fa-star"></i>';
-
-    let priceClass = '';
+    let badge='', stockTxt='', stockClass='';
+    if (p.stock>10)      { stockTxt='В наличии'; badge='<span class="badge new">NEW</span>'; stockClass='in-stock'; }
+    else if (p.stock>0)  { stockTxt=`Мало (${p.stock})`; badge='<span class="badge sale">SALE</span>'; stockClass='low-stock'; }
+    else                 { stockTxt='Нет в наличии'; badge='<span class="badge out">OUT</span>';  stockClass='out-of-stock'; }
+    const full=Math.floor(p.rating), half=p.rating%1>=0.5;
+    let stars=''; for (let i=1;i<=5;i++) stars += i<=full?'<i class="fas fa-star"></i>':(i===full+1&&half?'<i class="fas fa-star-half-alt"></i>':'<i class="far fa-star"></i>');
     const oldPrice = prevPrices.get(p.id);
-    let flag = '';
-    if (updatedProducts.has(p.id)) {
-      flag = `<span class="price-flag"><i class="fas fa-sync-alt" style="font-size:.95em;"></i> Цена обновлена</span>`;
-    }
+    let priceClass='', flag='';
+    if (updatedProducts.has(p.id)) flag='<span class="price-flag"><i class="fas fa-sync-alt" style="font-size:.95em;"></i> Цена обновлена</span>';
     if (oldPrice !== undefined && oldPrice !== p.price) {
-      priceClass = p.price > oldPrice ? 'price-up' : 'price-down';
+      priceClass = p.price>oldPrice?'price-up':'price-down';
       updatedProducts.add(p.id);
-      flag = `<span class="price-flag"><i class="fas fa-sync-alt" style="font-size:.95em;"></i> Цена обновлена</span>`;
+      flag = '<span class="price-flag"><i class="fas fa-sync-alt" style="font-size:.95em;"></i> Цена обновлена</span>';
     }
-
     return `
       <div class="item" data-id="${p.id}">
         ${badge}
@@ -190,56 +162,44 @@ function renderParts(arr) {
         <h3>${lowerAfterFirstWord(p.name)}</h3>
         <div class="category" data-category="${p.category}">${lowerAfterFirstWord(p.category)}</div>
         <div class="price ${priceClass}">
-          <span class="price-value">${p.price.toLocaleString('ru-RU')}</span> <span>₽</span>
-          ${flag}
+          <span class="price-value">${p.price.toLocaleString('ru-RU')}</span> ₽ ${flag}
         </div>
         <button class="btn analysis-btn" data-id="${p.id}" style="margin-top:8px;">Показать историю цен</button>
         <div class="analysis-container" id="analysis-${p.id}" style="display:none; margin-top:16px;"></div>
         <div class="toast-hint" id="toast-${p.id}"></div>
-        <p>${p.description || ''}</p>
+        <p>${p.description||''}</p>
         <div class="stock ${stockClass}">${stockTxt}</div>
         <div class="rating">${stars} <span>${p.rating}</span></div>
       </div>
     `;
   }).join('');
 
+  // После отрисовки обновляем состояния цен
   arr.forEach(p => {
-    const itemEl  = document.querySelector(`.item[data-id="${p.id}"]`);
-    const priceEl = itemEl?.querySelector('.price');
-    const flagEl  = itemEl?.querySelector('.price-flag');
-    const toastEl = itemEl?.querySelector('.toast-hint');
+    const itemEl = document.querySelector(`.item[data-id="${p.id}"]`);
+    const priceEl = itemEl.querySelector('.price');
+    const flagEl  = itemEl.querySelector('.price-flag');
+    const toastEl = itemEl.querySelector('.toast-hint');
     const old = prevPrices.get(p.id);
-
     if (old !== undefined && old !== p.price) {
-      priceEl?.classList.remove('price-up','price-down');
-      void priceEl?.offsetWidth;
-      if (p.price > old) priceEl?.classList.add('price-up');
-      else               priceEl?.classList.add('price-down');
-      let delta = Math.abs(p.price - old).toLocaleString('ru-RU');
-      let toast = p.price > old
-        ? `Цена увеличилась на ${delta} ₽`
-        : `Цена снижена на ${delta} ₽`;
-      toast = lowerAfterFirstWord(toast);
-      toastEl.textContent = toast;
-      toastEl.classList.add('show');
-      flagEl?.classList.remove('hide');
-      setTimeout(() => {
-        toastEl.classList.remove('show');
-        priceEl?.classList.remove('price-up','price-down');
-      }, 1800);
-    }
-    prevPrices.set(p.id, p.price);
-  });
+      priceEl.classList.remove('price-up','price-down'); void priceEl.offsetWidth;
+      priceEl.classList.add(p.price>old?'price-up':'price-down');
+      const delta = Math.abs(p.price-old).toLocaleString('ru-RU');
+      let toast = p.price>old?`Цена увеличилась на ${delta} ₽`:`Цена снижена на ${delta} ₽`;
+      toastEl.textContent = lowerAfterFirstWord(toast);
+      toastEl.classList.add('show'); flagEl.classList.remove('hide');
+      setTimeout(()=>{
+      toastEl.classList.remove('show');
+      priceEl.classList.remove('price-up','price-down');
+   },1800);
+  }
+  prevPrices.set(p.id,p.price);
+});
 
-  document.querySelectorAll('.analysis-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const id = btn.getAttribute('data-id');
-      showAnalysis(id);
-    });
-  });
+  document.querySelectorAll('.analysis-btn').forEach(btn=>btn.addEventListener('click',()=>showAnalysis(btn.dataset.id)));
 }
 
-
+// ======= АНАЛИЗ ЦЕНЫ =======
 function showAnalysis(id) {
 
   const part = partsData.find(p=>String(p.id)===String(id));
@@ -310,29 +270,7 @@ function showAnalysis(id) {
       layout:{padding:{top:20,right:20,bottom:20,left:20}}
     }
   });
-  
-  // Принудительное обновление размеров
-  setTimeout(() => {
-    if (container._chart) {
-      container._chart.resize();
-    }
-  }, 50);
-}
 
-// ======= ОБРАБОТКА ТЕКСТА ДЛЯ СВАЙПЕРОВ =======
-function lowerAfterFirstWord(str) {
-  return str.replace(/^\s*(\S+)/, (m, w) =>
-      w[0].toUpperCase() + w.slice(1).toLowerCase()
-    ).replace(/(\s+)(\S+)/g, (m, s, w) =>
-      s + w.toLowerCase()
-    );
+  // Перерисовка для корректных размеров
+  setTimeout(()=>container._chart?.resize(),50);
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.reviews .swiper-slide .content p').forEach(el => {
-    el.textContent = lowerAfterFirstWord(el.textContent);
-  });
-  document.querySelectorAll('.reviews .swiper-slide .content h3').forEach(el => {
-    el.textContent = lowerAfterFirstWord(el.textContent);
-  });
-});
