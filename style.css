@@ -567,32 +567,6 @@ section{
     resize: none;
 }
 
-.chartjs-tooltip {
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.3s ease;
-  pointer-events: none;
-}
-
-.chartjs-tooltip-active {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-/* Улучшаем позиционирование графика */
-.chart-container {
-  position: relative;
-  margin: 0 auto;
-  width: 100%;
-}
-
-/* Улучшаем видимость точек */
-.chartjs-render-monitor {
-  position: relative;
-  z-index: 1;
-}
-
 .footer{
     background: var(--light-yellow);
     padding-bottom: 8rem;
@@ -1357,3 +1331,30 @@ section{
   min-width: 115px;
 }
 
+/* Добавьте в конец файла */
+.chart-container {
+  position: relative;
+  height: 250px;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.chartjs-tooltip {
+  background: rgba(19, 15, 64, 0.9) !important;
+  border: 1px solid var(--yellow) !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem 1rem !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+  opacity: 1 !important;
+  transition: all 0.3s ease !important;
+}
+
+.chartjs-tooltip-header {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: var(--yellow);
+}
+
+.chartjs-tooltip-body {
+  font-size: 1.4rem;
+}

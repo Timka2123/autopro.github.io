@@ -259,7 +259,9 @@ function showAnalysis(id) {
 
   container.innerHTML = `
     <div style="font-size:1.1em;margin-bottom:0.5em;"><b>История цен:</b></div>
-    <canvas id="chart-${id}" width="440" height="190" style="max-width:100%;display:block"></canvas>
+    <div class="chart-container">
+      <canvas id="chart-${id}"></canvas>
+    </div>
     <div style="margin-top:0.5em;">
       <span>Средний спрос: <b>${avg ? avg.toFixed(1) : "-"}</b> шт/мес</span><br>
       <span>Сезонный коэффициент (${monthNames[nextMonth]}): <b>${seasonality[nextMonth]}</b></span><br>
@@ -271,6 +273,11 @@ function showAnalysis(id) {
   if (container._chart) container._chart.destroy();
   
   const ctx = document.getElementById(`chart-${id}`).getContext('2d');
+  
+  // Рассчитываем размеры контейнера
+  const containerWidth = container.clientWidth;
+  const responsiveHeight = Math.max(200, containerWidth * 0.4);
+  
   container._chart = new Chart(ctx, {
     type: 'line',
     data: {
@@ -278,29 +285,34 @@ function showAnalysis(id) {
       datasets: [{
         label: 'Цена, ₽',
         data: prices,
-        borderColor: '#facc15',
-        backgroundColor: 'rgba(250,204,21,0.1)',
-        fill: false,
-        tension: 0.1,
+        borderColor: '#f9d806',
+        backgroundColor: 'rgba(249, 216, 6, 0.1)',
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#130f40',
+        pointBorderColor: '#fff',
         pointRadius: 5,
-        pointHoverRadius: 1
+        pointHoverRadius: 8,
+        pointBorderWidth: 2,
+        pointHoverBorderWidth: 2
       }]
     },
     options: {
-      responsive: false,
+      responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
         tooltip: {
           enabled: true,
           mode: 'index',
           intersect: false,
-          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          backgroundColor: 'rgba(19, 15, 64, 0.9)',
           padding: 12,
-          borderColor: '#facc15',
+          borderColor: '#f9d806',
           borderWidth: 1,
           cornerRadius: 8,
-          titleFont: { size: 14 },
-          bodyFont: { size: 13 },
+          titleFont: { size: 16, weight: 'bold' },
+          bodyFont: { size: 14 },
           displayColors: false,
           callbacks: {
             title: items => {
@@ -310,12 +322,10 @@ function showAnalysis(id) {
               const i = ctx.dataIndex;
               const price = prices[i];
               
-              // Рассчитываем первый и последний день месяца
               const year = new Date().getFullYear();
               const firstDay = 1;
               const lastDay = new Date(year, i + 1, 0).getDate();
               
-              // Форматируем цену без дробной части
               const formattedPrice = price.toLocaleString('ru-RU', {
                 maximumFractionDigits: 0,
                 minimumFractionDigits: 0
@@ -323,7 +333,7 @@ function showAnalysis(id) {
               
               return [
                 `Цена: ${formattedPrice} ₽`,
-                `Период: ${firstDay}-${lastDay} ${monthNamesGenitive[i]}`
+                `Период: ${firstDay}-${lastDay} ${monthNamesGenitive[i]} ${year}`
               ];
             }
           }
@@ -331,41 +341,67 @@ function showAnalysis(id) {
       },
       scales: {
         x: {
-          title: { display: true, text: 'Месяц' },
+          title: { 
+            display: true, 
+            text: 'Месяц',
+            font: { size: 14, weight: 'bold' }
+          },
           grid: {
-            display: false
+            display: false,
+            drawBorder: true
           },
           ticks: {
-            maxRotation: 0,
-            padding: 10
+            font: { size: 12 },
+            maxRotation: 45,
+            minRotation: 45
           }
         },
         y: {
-          title: { display: true, text: 'Цена, ₽' },
+          title: { 
+            display: true, 
+            text: 'Цена, ₽',
+            font: { size: 14, weight: 'bold' }
+          },
           beginAtZero: false,
           grid: {
-            color: 'rgba(0, 0, 0, 0.05)'
+            color: 'rgba(0, 0, 0, 0.05)',
+            drawBorder: false
+          },
+          ticks: {
+            font: { size: 12 },
+            padding: 10,
+            callback: function(value) {
+              return value.toLocaleString('ru-RU') + ' ₽';
+            }
           }
         }
       },
-      // Исправляем позиционирование точек
+      interaction: {
+        mode: 'nearest',
+        axis: 'x',
+        intersect: false
+      },
+      animation: {
+        duration: 300,
+        easing: 'easeOutQuart'
+      },
       layout: {
         padding: {
-          left: 10,
-          right: 10,
-          top: 10,
-          bottom: 10
-        }
-      },
-      elements: {
-        point: {
-          position: 'nearest',
-          hitRadius: 1,
-          hoverRadius: 1
+          top: 20,
+          right: 20,
+          bottom: 20,
+          left: 20
         }
       }
     }
   });
+  
+  // Принудительное обновление размеров
+  setTimeout(() => {
+    if (container._chart) {
+      container._chart.resize();
+    }
+  }, 50);
 }
 
 // ======= ОБРАБОТКА ТЕКСТА ДЛЯ СВАЙПЕРОВ =======
