@@ -237,39 +237,54 @@ function showAnalysis(id) {
   if (container._chart) container._chart.destroy();
 
   const ctx = document.getElementById(`chart-${id}`).getContext('2d');
-  container._chart = new Chart(ctx,{
-    type:'line',
-    data:{labels:monthNames,datasets:[{label:'Цена, ₽',data:prices,fill:true,tension:0.4,
-      borderColor:'#f9d806',backgroundColor:'rgba(249,216,6,0.1)',
-      pointBackgroundColor:'#130f40',pointBorderColor:'#fff',pointRadius:5,pointHoverRadius:8,pointBorderWidth:2,pointHoverBorderWidth:2
-    }]}
-    ,
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{enabled:true,mode:'index',intersect:false,
-        backgroundColor:'rgba(19,15,64,0.9)',padding:12,borderColor:'#f9d806',borderWidth:1,cornerRadius:8,
-        titleFont:{size:16,weight:'bold'},bodyFont:{size:14},displayColors:false,
-        callbacks:{
-          title:items=>monthNames[items[0].dataIndex],
-          label:ctx=>{
-            const i=ctx.dataIndex;const price=prices[i];
-            const year=new Date().getFullYear();const firstDay=1;
-            const lastDay=new Date(year,i+1,0).getDate();
-            return [
-              `Цена: ${price.toLocaleString('ru-RU')} ₽`,
-              `Период: ${firstDay}-${lastDay} ${monthNamesGenitive[i]} ${year}`
-            ];
-          }
-        }
-      }},
-      scales:{x:{title:{display:true,text:'Месяц',font:{size:14,weight:'bold'}},grid:{display:false,drawBorder:true},ticks:{font:{size:12},maxRotation:45,minRotation:45}},
-      y:{title:{display:true,text:'Цена, ₽',font:{size:14,weight:'bold'}},beginAtZero:false,grid:{color:'rgba(0,0,0,0.05)',drawBorder:false},ticks:{padding:10,callback:v=>v.toLocaleString('ru-RU')+' ₽',font:{size:12}}}
-      },
-      interaction:{mode:'nearest',axis:'x',intersect:false},
-      animation:{duration:300,easing:'easeOutQuart'},
-      layout:{padding:{top:20,right:20,bottom:20,left:20}}
+  const displayMonth = monthNames[nextMonth];
+  const displayCoef = seasonalCoefficient;
+  const displayForecast = forecast;
+  container._chart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: monthNames,
+    datasets: [{
+      label: 'Цена, ₽',
+      data: prices,
+      fill: true,
+      tension: 0.4,
+      borderColor: '#f9d806',
+      backgroundColor: 'rgba(249,216,6,0.1)',
+      pointBackgroundColor: '#130f40',
+      pointBorderColor: '#fff',
+      pointRadius: 5,
+      pointHoverRadius: 8,
+      pointBorderWidth: 2,
+      pointHoverBorderWidth: 2
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { /* твои настройки */ }
+    },
+    // ...остальное
+  },
+  plugins: [{
+    id: 'season-info',
+    afterDraw(chart) {
+      const { ctx, chartArea: area } = chart;
+      ctx.save();
+      ctx.font = 'bold 14px Arial';
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'right';
+      ctx.shadowColor = '#130f40';
+      ctx.shadowBlur = 7;
+      // Пишем инфо в правом нижнем углу
+      ctx.fillText(`Сезонный коэффициент (${displayMonth}): ${displayCoef}`, area.right - 8, area.bottom - 30);
+      ctx.fillText(`Прогноз на ${displayMonth}: ${displayForecast} шт`, area.right - 8, area.bottom - 10);
+      ctx.restore();
     }
-  });
+  }]
+});
 
   // Перерисовка для корректных размеров
   setTimeout(()=>container._chart?.resize(),50);
