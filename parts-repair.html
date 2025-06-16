@@ -24,38 +24,36 @@
   <div id="login-btn"><button class="btn">вход</button><i class="far fa-user"></i></div>
 </header>
 
-<section class="parts-repair">
-  <h1 class="heading">Каталог <span>запчастей</span></h1>
-  <div class="filters-container">
-    <div class="filter-box">
-      <h3>Категория</h3>
-      <select id="category-select"><option value="all">Все категории</option></select>
-    </div>
-    <div class="filter-box">
-      <h3>Бренд</h3>
-      <select id="brand-select"><option value="all">Все бренды</option></select>
-    </div>
-    <div class="filter-box">
-      <h3>Наличие</h3>
-      <select id="stock-select">
-        <option value="all">Все товары</option>
-        <option value="in-stock">В наличии</option>
-        <option value="low-stock">Мало на складе</option>
-        <option value="out-of-stock">Нет в наличии</option>
-      </select>
-    </div>
-    <div class="filter-box">
-      <h3>Сортировка</h3>
-      <select id="sort-select">
-        <option value="default">По умолчанию</option>
-        <option value="price-asc">Цена ↑</option>
-        <option value="price-desc">Цена ↓</option>
-        <option value="name-asc">Название А→Я</option>
-        <option value="name-desc">Название Я→А</option>
-      </select>
-    </div>
-    <button class="btn filter-btn" onclick="filterItems()">Применить</button>
+<div class="filters-bar">
+  <div class="filter-group">
+    <label for="category-select">Категория</label>
+    <select id="category-select"><option value="all">Все категории</option></select>
   </div>
+  <div class="filter-group">
+    <label for="brand-select">Бренд</label>
+    <select id="brand-select"><option value="all">Все бренды</option></select>
+  </div>
+  <div class="filter-group">
+    <label for="stock-select">Наличие</label>
+    <select id="stock-select">
+      <option value="all">Все товары</option>
+      <option value="in-stock">В наличии</option>
+      <option value="low-stock">Мало на складе</option>
+      <option value="out-of-stock">Нет в наличии</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label for="sort-select">Сортировка</label>
+    <select id="sort-select">
+      <option value="default">По умолчанию</option>
+      <option value="price-asc">Цена ↑</option>
+      <option value="price-desc">Цена ↓</option>
+      <option value="name-asc">Название А→Я</option>
+      <option value="name-desc">Название Я→А</option>
+    </select>
+  </div>
+</div>
+
 
   <div class="catalog" id="parts-catalog"></div>
 </section>
