@@ -96,7 +96,29 @@ function renderParts(arr) {
     prevPrices.set(p.id, p.price);
   });
 
-  document.querySelectorAll('.analysis-btn').forEach(btn => btn.addEventListener('click', () => showAnalysis(btn.dataset.id)));
+  // --- Кнопка с анимацией открытия/закрытия анализа ---
+  document.querySelectorAll('.analysis-btn').forEach(btn => btn.addEventListener('click', function () {
+    const id = btn.dataset.id;
+    const container = document.getElementById('analysis-' + id);
+    if (container.style.display !== 'none' && !container.classList.contains('closed')) {
+      // закрываем с анимацией
+      container.classList.add('closed');
+      setTimeout(() => {
+        container.style.display = 'none';
+        if (container._chart) {
+          container._chart.destroy();
+          container._chart = null;
+        }
+        container.innerHTML = '';
+      }, 420);
+    } else {
+      // открываем с анимацией
+      showAnalysis(id);
+      setTimeout(() => {
+        container.classList.remove('closed');
+      }, 10);
+    }
+  }));
 }
 
 // --- Анализ цены ---
@@ -104,6 +126,8 @@ function showAnalysis(id) {
   const part = partsData.find(p => String(p.id) === String(id));
   const container = document.getElementById('analysis-' + id);
   if (!part || !container) return;
+  container.classList.remove('closed');
+  container.style.display = 'block';
 
   // Всегда 12 месяцев, даже если в JSON меньше — добиваем нулями справа
   let sales = Array.isArray(part.sold) ? part.sold.slice(0, 12) : [];
@@ -127,7 +151,6 @@ function showAnalysis(id) {
   if (avg && nextMonth <= currentMonth) {
     seasonalCoefficient = sales[nextMonth] > 0 ? (sales[nextMonth] / avg).toFixed(2) : '1.00';
   } else if (avg) {
-    // Для будущих месяцев, которых еще не было — считаем коэффициент 1
     seasonalCoefficient = '1.00';
   } else {
     seasonalCoefficient = '-';
@@ -153,7 +176,6 @@ function showAnalysis(id) {
     </div>
   `;
 
-  container.style.display = 'block';
   if (container._chart) container._chart.destroy();
 
   const ctx = document.getElementById(`chart-${id}`).getContext('2d');
