@@ -1447,3 +1447,15 @@ section{
   }
 }
 
+@media (min-width: 0px) {
+  .filters-bar {
+    margin-top: 8.5rem; /* 3rem (padding) + чуть больше для box-shadow и адаптива */
+  }
+}
+
+@media (max-width: 991px) {
+  .filters-bar {
+    margin-top: 7rem; /* если на малых экранах шапка ниже */
+  }
+}
+
