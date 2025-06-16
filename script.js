@@ -240,6 +240,7 @@ function renderParts(arr) {
 }
 
 // ======= АНАЛИЗ ЦЕНЫ =======
+// ======= АНАЛИЗ ЦЕНЫ =======
 function showAnalysis(id) {
   const part = partsData.find(p => String(p.id) === String(id));
   const container = document.getElementById('analysis-' + id);
@@ -291,8 +292,8 @@ function showAnalysis(id) {
         legend: { display: false },
         tooltip: {
           enabled: true,
-          mode: 'nearest',
-          intersect: true,
+          mode: 'index',
+          intersect: false,
           backgroundColor: 'rgba(0, 0, 0, 0.9)',
           padding: 12,
           borderColor: '#facc15',
@@ -302,7 +303,9 @@ function showAnalysis(id) {
           bodyFont: { size: 13 },
           displayColors: false,
           callbacks: {
-            title: items => items[0].label,
+            title: items => {
+              return `${monthNames[items[0].dataIndex]}`;
+            },
             label: ctx => {
               const i = ctx.dataIndex;
               const price = prices[i];
@@ -328,11 +331,37 @@ function showAnalysis(id) {
       },
       scales: {
         x: {
-          title: { display: true, text: 'Месяц' }
+          title: { display: true, text: 'Месяц' },
+          grid: {
+            display: false
+          },
+          ticks: {
+            maxRotation: 0,
+            padding: 10
+          }
         },
         y: {
           title: { display: true, text: 'Цена, ₽' },
-          beginAtZero: false
+          beginAtZero: false,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        }
+      },
+      // Исправляем позиционирование точек
+      layout: {
+        padding: {
+          left: 10,
+          right: 10,
+          top: 10,
+          bottom: 10
+        }
+      },
+      elements: {
+        point: {
+          position: 'nearest',
+          hitRadius: 20,
+          hoverRadius: 8
         }
       }
     }
