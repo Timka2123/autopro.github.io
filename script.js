@@ -52,12 +52,13 @@ try {
   }
 } catch(e) {}
 
-/* --- Глобальные данные --- */
+// --- Глобальные переменные и хелперы ---
 const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const monthNamesGenitive = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
 let partsData = [];
 let prevPrices = new Map();
 const updatedProducts = new Set();
+const CLOSE_TIMEOUT = 5000; // 5 секунд
 
 function lowerAfterFirstWord(str) {
   return str
@@ -65,6 +66,7 @@ function lowerAfterFirstWord(str) {
     .replace(/(\s+)(\S+)/g, (m, s, w) => s + w.toLowerCase());
 }
 
+// --- Загрузка и рендер каталога ---
 document.addEventListener('DOMContentLoaded', () => {
   loadAndRender();
   setInterval(loadAndRender, 30000);
@@ -78,6 +80,7 @@ function loadAndRender() {
       partsData = data;
       renderParts(partsData);
       populateFilters();
+      setupFilterListeners();
     })
     .catch(err => {
       document.getElementById('parts-catalog').innerHTML = '<div class="no-results"><i class="fas fa-exclamation-triangle"></i><h3>Ошибка загрузки данных</h3></div>';
@@ -85,6 +88,62 @@ function loadAndRender() {
     });
 }
 
+// --- Фильтры ---
+function populateFilters() {
+  const catSel = document.getElementById('category-select');
+  const brSel  = document.getElementById('brand-select');
+  if (!catSel || !brSel) return;
+  const catVal = catSel.value;
+  const brVal  = brSel.value;
+  catSel.innerHTML = '<option value="all">Все категории</option>';
+  brSel.innerHTML  = '<option value="all">Все бренды</option>';
+  [...new Set(partsData.map(p => p.category))].forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
+  [...new Set(partsData.map(p => p.brand))].forEach(b => brSel.innerHTML  += `<option value="${b}">${b}</option>`);
+  catSel.value = catVal;
+  brSel.value  = brVal;
+}
+
+function setupFilterListeners() {
+  document.getElementById('category-select')?.addEventListener('change', filterItems);
+  document.getElementById('brand-select')?.addEventListener('change', filterItems);
+  document.getElementById('stock-select')?.addEventListener('change', filterItems);
+  document.getElementById('sort-select')?.addEventListener('change', filterItems);
+  // Кнопка "Применить" (на случай если пользователь предпочитает клик)
+  document.querySelector('.filter-btn')?.addEventListener('click', filterItems);
+}
+
+function filterItems() {
+  const catSel = document.getElementById('category-select');
+  const brSel  = document.getElementById('brand-select');
+  const stockSel = document.getElementById('stock-select');
+  const sortSel  = document.getElementById('sort-select');
+  let items = partsData.slice();
+
+  if (catSel && catSel.value !== 'all')
+    items = items.filter(p => p.category === catSel.value);
+
+  if (brSel && brSel.value !== 'all')
+    items = items.filter(p => p.brand === brSel.value);
+
+  if (stockSel) {
+    if (stockSel.value === 'in-stock')      items = items.filter(p => p.stock > 10);
+    else if (stockSel.value === 'low-stock') items = items.filter(p => p.stock > 0 && p.stock <= 10);
+    else if (stockSel.value === 'out-of-stock') items = items.filter(p => p.stock === 0);
+  }
+
+  if (sortSel && sortSel.value !== 'default') {
+    const cmp = {
+      'price-asc':  (a,b)=>a.price-b.price,
+      'price-desc': (a,b)=>b.price-a.price,
+      'name-asc':   (a,b)=>a.name.localeCompare(b.name),
+      'name-desc':  (a,b)=>b.name.localeCompare(a.name)
+    }[sortSel.value];
+    items.sort(cmp);
+  }
+  renderParts(items);
+}
+
+// --- Каталог и анализ ---
 function renderParts(arr) {
   const box = document.getElementById('parts-catalog');
   if (!arr.length) {
@@ -147,43 +206,33 @@ function renderParts(arr) {
     prevPrices.set(p.id, p.price);
   });
 
-  // --- Кнопка с анимацией и авто-закрытием ---
+  // --- Кнопка анализа + автоанимация ---
   document.querySelectorAll('.analysis-btn').forEach(btn => btn.addEventListener('click', function () {
     const id = btn.dataset.id;
     const container = document.getElementById('analysis-' + id);
-
-    // Очистка предыдущего таймера автозакрытия (если был)
     if (container._closeTimer) {
       clearTimeout(container._closeTimer);
       container._closeTimer = null;
     }
-
     if (container.style.display !== 'none' && !container.classList.contains('closed')) {
       closeAnalysis(container);
     } else {
       showAnalysis(id);
       setTimeout(() => container.classList.remove('closed'), 10);
-
-      // Автоматическое закрытие через 10 секунд неиспользования
       setAnalysisAutoClose(container, btn);
     }
   }));
 }
 
-// --- Автоматическое и мягкое закрытие анализа ---
 function setAnalysisAutoClose(container, btn) {
   let lastActive = Date.now();
 
   function resetTimer() {
     lastActive = Date.now();
-    if (container._closeTimer) {
-      clearTimeout(container._closeTimer);
-    }
+    if (container._closeTimer) clearTimeout(container._closeTimer);
     container._closeTimer = setTimeout(() => {
-      if (Date.now() - lastActive >= 5000) { // 5 сек
-        closeAnalysis(container);
-      }
-    }, 5000);
+      if (Date.now() - lastActive >= CLOSE_TIMEOUT) closeAnalysis(container);
+    }, CLOSE_TIMEOUT);
   }
 
   container.onmouseenter = resetTimer;
@@ -194,6 +243,7 @@ function setAnalysisAutoClose(container, btn) {
   btn.onmouseleave = resetTimer;
   resetTimer();
 }
+
 function closeAnalysis(container) {
   container.classList.add('closed');
   setTimeout(() => {
@@ -206,7 +256,7 @@ function closeAnalysis(container) {
   }, 700);
 }
 
-// --- Анализ цены ---
+// --- Анализ цены (график и расчет) ---
 function showAnalysis(id) {
   const part = partsData.find(p => String(p.id) === String(id));
   const container = document.getElementById('analysis-' + id);
@@ -329,16 +379,5 @@ function showAnalysis(id) {
   setTimeout(() => container._chart?.resize(), 50);
 }
 
-function populateFilters() {
-  const catSel = document.getElementById('category-select');
-  const brSel  = document.getElementById('brand-select');
-  const catVal = catSel?.value || 'all';
-  const brVal  = brSel?.value || 'all';
-  if (!catSel || !brSel) return;
-  catSel.innerHTML = '<option value="all">Все категории</option>';
-  brSel.innerHTML  = '<option value="all">Все бренды</option>';
-  [...new Set(partsData.map(p => p.category))].forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
-  [...new Set(partsData.map(p => p.brand))].forEach(b => brSel.innerHTML  += `<option value="${b}">${b}</option>`);
-  catSel.value = catVal;
-  brSel.value  = brVal;
-}
+// --- Конец ---
+
