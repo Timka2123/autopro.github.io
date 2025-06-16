@@ -239,7 +239,7 @@ function renderParts(arr) {
   });
 }
 
-// ======= АНАЛИЗ ЦЕНЫ =======
+
 // ======= АНАЛИЗ ЦЕНЫ =======
 function showAnalysis(id) {
   const part = partsData.find(p => String(p.id) === String(id));
@@ -360,7 +360,7 @@ function showAnalysis(id) {
       elements: {
         point: {
           position: 'nearest',
-          hitRadius: 20,
+          hitRadius: 1,
           hoverRadius: 8
         }
       }
