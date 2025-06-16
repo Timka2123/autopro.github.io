@@ -1,4 +1,58 @@
-// --- Хелперы и глобалки ---
+/* --- Бургер-меню --- */
+const menuBtn = document.querySelector('#menu-btn');
+const navbar  = document.querySelector('.navbar');
+menuBtn && (menuBtn.onclick = () => {
+  menuBtn.classList.toggle('fa-times');
+  navbar.classList.toggle('active');
+});
+
+/* --- Форма входа --- */
+const loginBtn   = document.querySelector('#login-btn');
+const loginForm  = document.querySelector('.login-form-container');
+const closeLogin = document.querySelector('#close-login-form');
+loginBtn?.addEventListener('click', () => loginForm.classList.toggle('active'));
+closeLogin?.addEventListener('click', () => loginForm.classList.remove('active'));
+
+/* --- Фиксированная шапка при скролле --- */
+const header = document.querySelector('.header');
+window.addEventListener('scroll', () => {
+  menuBtn?.classList.remove('fa-times');
+  navbar?.classList.remove('active');
+  header?.classList.toggle('active', window.scrollY > 0);
+});
+
+/* --- Параллакс на секции .home --- */
+const home      = document.querySelector('.home');
+const parallaxs = document.querySelectorAll('.home-parallax');
+home?.addEventListener('mousemove', e => {
+  parallaxs.forEach(el => {
+    const speed = el.dataset.speed;
+    el.style.transform = `translateX(${(window.innerWidth  - e.pageX * speed) / 90}px) translateY(${(window.innerHeight - e.pageY * speed) / 90}px)`;
+  });
+});
+home?.addEventListener('mouseleave', () => {
+  parallaxs.forEach(el => (el.style.transform = 'translateX(0) translateY(0)'));
+});
+
+/* --- Swiper-слайдеры --- */
+const baseOpts = {
+  grabCursor: true,
+  centeredSlides: true,
+  spaceBetween: 20,
+  loop: true,
+  autoplay: { delay: 9500, disableOnInteraction: false },
+  pagination: { el: '.swiper-pagination', clickable: true },
+  breakpoints: { 0: { slidesPerView: 1 }, 768: { slidesPerView: 2 }, 1024:{ slidesPerView: 3 } }
+};
+try {
+  if (typeof Swiper !== 'undefined') {
+    new Swiper('.vehicles-slider', baseOpts);
+    new Swiper('.featured-slider', baseOpts);
+    new Swiper('.review-slider',   baseOpts);
+  }
+} catch(e) {}
+
+/* --- Глобальные данные --- */
 const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const monthNamesGenitive = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
 let partsData = [];
@@ -11,7 +65,7 @@ function lowerAfterFirstWord(str) {
     .replace(/(\s+)(\S+)/g, (m, s, w) => s + w.toLowerCase());
 }
 
-// --- Загрузка данных и рендер ---
+/* --- Загрузка данных и рендер --- */
 document.addEventListener('DOMContentLoaded', () => {
   loadAndRender();
   setInterval(loadAndRender, 30000);
@@ -32,7 +86,7 @@ function loadAndRender() {
     });
 }
 
-// --- Каталог ---
+/* --- Каталог и анализ --- */
 function renderParts(arr) {
   const box = document.getElementById('parts-catalog');
   if (!arr.length) {
@@ -74,7 +128,6 @@ function renderParts(arr) {
     `;
   }).join('');
 
-  // После отрисовки обновляем состояния цен
   arr.forEach(p => {
     const itemEl = document.querySelector(`.item[data-id="${p.id}"]`);
     const priceEl = itemEl.querySelector('.price');
@@ -96,12 +149,10 @@ function renderParts(arr) {
     prevPrices.set(p.id, p.price);
   });
 
-  // --- Кнопка с анимацией открытия/закрытия анализа ---
   document.querySelectorAll('.analysis-btn').forEach(btn => btn.addEventListener('click', function () {
     const id = btn.dataset.id;
     const container = document.getElementById('analysis-' + id);
     if (container.style.display !== 'none' && !container.classList.contains('closed')) {
-      // закрываем с анимацией
       container.classList.add('closed');
       setTimeout(() => {
         container.style.display = 'none';
@@ -112,7 +163,6 @@ function renderParts(arr) {
         container.innerHTML = '';
       }, 420);
     } else {
-      // открываем с анимацией
       showAnalysis(id);
       setTimeout(() => {
         container.classList.remove('closed');
@@ -121,7 +171,7 @@ function renderParts(arr) {
   }));
 }
 
-// --- Анализ цены ---
+/* --- Анализ цены --- */
 function showAnalysis(id) {
   const part = partsData.find(p => String(p.id) === String(id));
   const container = document.getElementById('analysis-' + id);
@@ -129,24 +179,23 @@ function showAnalysis(id) {
   container.classList.remove('closed');
   container.style.display = 'block';
 
-  // Всегда 12 месяцев, даже если в JSON меньше — добиваем нулями справа
+  // Гарантируем 12 месяцев (нули если нет данных)
   let sales = Array.isArray(part.sold) ? part.sold.slice(0, 12) : [];
   let prices = Array.isArray(part.currency) ? part.currency.slice(0, 12) : [];
   while (sales.length < 12) sales.push(0);
   while (prices.length < 12) prices.push(part.price);
 
-  // Индекс текущего месяца (0 — январь)
+  // Текущий и следующий месяц
   const now = new Date();
   const currentMonth = now.getMonth();
   const nextMonth = (currentMonth + 1) % 12;
 
   // Средний спрос только по прошедшим месяцам (до текущего)
-  const monthsPassed = sales.slice(0, currentMonth + 1); // +1, чтобы включить текущий месяц
+  const monthsPassed = sales.slice(0, currentMonth + 1);
   const avg = monthsPassed.filter(x => x > 0).length
     ? monthsPassed.filter(x => x > 0).reduce((a, b) => a + b, 0) / monthsPassed.filter(x => x > 0).length
     : 0;
 
-  // Сезонный коэффициент для следующего месяца: если нет продаж в будущем — прогнозируем по среднему (коэффициент=1)
   let seasonalCoefficient;
   if (avg && nextMonth <= currentMonth) {
     seasonalCoefficient = sales[nextMonth] > 0 ? (sales[nextMonth] / avg).toFixed(2) : '1.00';
@@ -155,11 +204,9 @@ function showAnalysis(id) {
   } else {
     seasonalCoefficient = '-';
   }
-
-  // Прогноз = средний спрос * коэффициент (для будущих месяцев — средний спрос)
   const forecast = (avg && seasonalCoefficient !== '-') ? Math.round(avg * parseFloat(seasonalCoefficient)) : 0;
 
-  // Сохраняем коэффициент и прогноз в data-атрибутах элемента .item
+  // Сохраняем коэффициент и прогноз в data-атрибутах
   const itemEl = document.querySelector(`.item[data-id="${id}"]`);
   if (itemEl) {
     itemEl.dataset.seasonalCoefficient = seasonalCoefficient;
@@ -251,7 +298,7 @@ function showAnalysis(id) {
   setTimeout(() => container._chart?.resize(), 50);
 }
 
-// --- Фильтры (если используешь) ---
+/* --- Фильтры (если используешь) --- */
 function populateFilters() {
   const catSel = document.getElementById('category-select');
   const brSel  = document.getElementById('brand-select');
