@@ -283,7 +283,7 @@ function showAnalysis(id) {
         fill: false,
         tension: 0.1,
         pointRadius: 5,
-        pointHoverRadius: 9
+        pointHoverRadius: 1
       }]
     },
     options: {
@@ -361,7 +361,7 @@ function showAnalysis(id) {
         point: {
           position: 'nearest',
           hitRadius: 1,
-          hoverRadius: 8
+          hoverRadius: 1
         }
       }
     }
