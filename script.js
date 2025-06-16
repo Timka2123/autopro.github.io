@@ -180,10 +180,10 @@ function setAnalysisAutoClose(container, btn) {
       clearTimeout(container._closeTimer);
     }
     container._closeTimer = setTimeout(() => {
-      if (Date.now() - lastActive >= 10000) { // 10 сек
+      if (Date.now() - lastActive >= 5000) { // 5 сек
         closeAnalysis(container);
       }
-    }, 10000);
+    }, 5000);
   }
 
   container.onmouseenter = resetTimer;
