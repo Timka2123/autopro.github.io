@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs from 'fs';
 
 let data;
 try {
