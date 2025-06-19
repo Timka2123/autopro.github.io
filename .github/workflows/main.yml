@@ -1,0 +1,36 @@
+name: Validate and Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'export_fixed.json'
+      - '.github/workflows/validate-json.yml'
+      - '.github/workflows/check-structure.js'
+
+jobs:
+  validate-json:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Установить Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Проверить структуру export_fixed.json
+        run: node .github/workflows/check-structure.js
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: validate-json  # <-- Эта строка говорит, что deploy запускается ТОЛЬКО если validate-json прошёл успешно
+    steps:
+      - uses: actions/checkout@v3
+
+      # Пример деплоя через gh-pages (peaceiris)
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./ # или путь к папке с сайтом (например, 'dist' или 'build')
