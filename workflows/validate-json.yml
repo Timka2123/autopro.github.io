@@ -1,0 +1,23 @@
+name: Проверка и деплой JSON
+
+on:
+  push:
+    paths:
+      - 'export_fixed.json'
+      - '.github/workflows/validate-json.yml'
+
+jobs:
+  validate-json:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Клонировать репозиторий
+        uses: actions/checkout@v3
+
+      - name: Проверить, что JSON валидный
+        run: |
+          jq empty export_fixed.json
+
+      - name: Проверить структуру JSON через скрипт
+        run: |
+          node .github/workflows/check-structure.js
+        continue-on-error: false
