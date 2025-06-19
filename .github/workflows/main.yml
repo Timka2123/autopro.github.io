@@ -20,7 +20,7 @@ jobs:
           node-version: '20'
 
       - name: Проверить структуру export_fixed.json
-        run: node .github/workflows/check-structure.js
+        run: node .github/workflows/check-structure.cjs
 
   deploy:
     runs-on: ubuntu-latest
