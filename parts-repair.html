@@ -75,52 +75,13 @@
 <!-- Chart.js для графика анализа -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- твой script.js -->
-<script src="script.js"></script>
+
 
 <!-- Firebase: вставь прямо сюда перед закрывающим </body> -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
-<script>
-  // Твой конфиг — всё уже готово!
-  const firebaseConfig = {
-    apiKey: "AIzaSyAjVd0NGBE3_r4Ot9phZ-SzIhWMyEYNfrw",
-    authDomain: "autopro-e3161.firebaseapp.com",
-    projectId: "autopro-e3161",
-    storageBucket: "autopro-e3161.firebasestorage.app",
-    messagingSenderId: "274244574652",
-    appId: "1:274244574652:web:012f0b403667f98b5c1fb9",
-    measurementId: "G-G0FH4XQTCC"
-  };
-  firebase.initializeApp(firebaseConfig);
-</script>
+<script src="script.js"></script>
 
-<!-- Корзина: логика добавления и счетчика (оставь этот код, если ещё нет в script.js) -->
-<script>
-  function getCart() {
-    return JSON.parse(localStorage.getItem('cart')) || [];
-  }
-  function updateCartCounter() {
-    const cart = getCart();
-    let total = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
-    const el = document.getElementById('cart-counter');
-    if (el) el.innerText = total;
-  }
-  document.addEventListener('DOMContentLoaded', updateCartCounter);
 
-  // Чтобы добавить товар в корзину:
-  // addToCart({id: "123", title: "Название", qty: 1, price: 999});
-  function addToCart(item) {
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    let idx = cart.findIndex(i => i.id === item.id);
-    if (idx !== -1) {
-      cart[idx].qty += item.qty;
-    } else {
-      cart.push(item);
-    }
-    localStorage.setItem('cart', JSON.stringify(cart));
-    updateCartCounter();
-    alert('Товар добавлен в корзину!');
-  }
-</script>
 </body>
 </html>

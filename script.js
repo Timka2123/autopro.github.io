@@ -422,3 +422,4 @@ auth.onAuthStateChanged(user => {
     document.getElementById('user-email').textContent = '';
   }
 });
+
