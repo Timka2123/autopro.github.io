@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Firebase config
+  // ==== ИНИЦИАЛИЗАЦИЯ FIREBASE ====
   const firebaseConfig = {
     apiKey: "AIzaSyAjVd0NGBE3_r4Ot9phZ-SzIhWMyEYNfrw",
     authDomain: "autopro-e3161.firebaseapp.com",
@@ -9,8 +9,40 @@ document.addEventListener('DOMContentLoaded', () => {
     appId: "1:274244574652:web:012f0b403667f98b5c1fb9",
     measurementId: "G-G0FH4XQTCC"
   };
-  firebase.initializeApp(firebaseConfig);
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
   const auth = firebase.auth();
+
+  // ==== ЛОГИКА АВТОРИЗАЦИИ ====
+
+  // Войти через Google
+  const loginBtn = document.getElementById('login-btn');
+  const logoutBtn = document.getElementById('logout-btn');
+  const userEmail = document.getElementById('user-email');
+
+  if (loginBtn && logoutBtn && userEmail) {
+    loginBtn.onclick = function() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then(() => location.reload())
+        .catch(error => alert(error.message));
+    };
+    logoutBtn.onclick = function() {
+      auth.signOut().then(() => location.reload());
+    };
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        loginBtn.style.display = 'none';
+        logoutBtn.style.display = '';
+        userEmail.textContent = user.email;
+      } else {
+        loginBtn.style.display = '';
+        logoutBtn.style.display = 'none';
+        userEmail.textContent = '';
+      }
+    });
+  }
 });
 
 /* --- Бургер-меню --- */
