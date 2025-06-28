@@ -31,15 +31,18 @@
         <a href="#contact">Контакт</a>
     </nav>
 
-    <div id="login-btn">
-        <button class="btn">Вход</button>
+    <div id="user-controls" style="display: flex; align-items: center; gap: 10px;">
+        <button id="login-btn" class="btn">Войти</button>
+        <button id="logout-btn" class="btn" style="display:none;">Выйти</button>
+        <span id="user-email" style="color: #333;"></span>
         <i class="far fa-user"></i>
     </div>
+
 
 </header>
 
     
-<div class="login-form-container">
+<!--<div class="login-form-container">
 
     <span id="close-login-form" class="fas fa-times"></span>
 
@@ -57,7 +60,7 @@
         <p> don't have an account <a href="#">create one</a> </p>
     </form>
 
-</div>
+</div>-->
 
 <section class="home" id="home">
 
@@ -613,8 +616,8 @@
 
 
 <script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"></script>
-
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
 <script src="script.js"></script>
-
 </body>
 </html>
