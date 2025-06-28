@@ -3,11 +3,6 @@ name: Validate and Deploy
 on:
   push:
     branches: [main]
-    paths:
-      - 'export_fixed.json'
-      - '.github/workflows/validate-json.yml'
-      - '.github/workflows/check-structure.js'
-
 jobs:
   validate-json:
     runs-on: ubuntu-latest
