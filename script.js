@@ -1,5 +1,5 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // ==== ИНИЦИАЛИЗАЦИЯ FIREBASE ====
+document.addEventListener('DOMContentLoaded', function() {
+  // 1. Firebase config:
   const firebaseConfig = {
     apiKey: "AIzaSyAjVd0NGBE3_r4Ot9phZ-SzIhWMyEYNfrw",
     authDomain: "autopro-e3161.firebaseapp.com",
@@ -9,28 +9,28 @@ document.addEventListener('DOMContentLoaded', () => {
     appId: "1:274244574652:web:012f0b403667f98b5c1fb9",
     measurementId: "G-G0FH4XQTCC"
   };
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
 
-  // ==== ЛОГИКА АВТОРИЗАЦИИ ====
-
-  // Войти через Google
+  // 2. Обработка логина/логаута:
   const loginBtn = document.getElementById('login-btn');
   const logoutBtn = document.getElementById('logout-btn');
   const userEmail = document.getElementById('user-email');
 
-  if (loginBtn && logoutBtn && userEmail) {
+  if (loginBtn) {
     loginBtn.onclick = function() {
       const provider = new firebase.auth.GoogleAuthProvider();
       auth.signInWithPopup(provider)
         .then(() => location.reload())
         .catch(error => alert(error.message));
     };
+  }
+  if (logoutBtn) {
     logoutBtn.onclick = function() {
       auth.signOut().then(() => location.reload());
     };
+  }
+  if (loginBtn && logoutBtn && userEmail) {
     auth.onAuthStateChanged(user => {
       if (user) {
         loginBtn.style.display = 'none';
@@ -43,7 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // --- Остальной твой код (бургер, каталог, swiper, т.д.) ---
 });
+
 
 /* --- Бургер-меню --- */
 const menuBtn = document.querySelector('#menu-btn');
@@ -53,12 +56,7 @@ menuBtn && (menuBtn.onclick = () => {
   navbar.classList.toggle('active');
 });
 
-/* --- Форма входа --- */
-const loginBtn   = document.querySelector('#login-btn');
-const loginForm  = document.querySelector('.login-form-container');
-const closeLogin = document.querySelector('#close-login-form');
-loginBtn?.addEventListener('click', () => loginForm.classList.toggle('active'));
-closeLogin?.addEventListener('click', () => loginForm.classList.remove('active'));
+
 
 /* --- Фиксированная шапка при скролле --- */
 const header = document.querySelector('.header');
