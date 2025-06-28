@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Каталог запчастей</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <!-- Внешние стили и иконки -->
+  <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="header active">
+  <div id="menu-btn" class="fas fa-bars"></div>
+  <a href="index.html" class="logo"><span>Авто</span>Партс</a>
+  <nav class="navbar">
+    <a href="index.html#home">Домашняя</a>
+    <a href="index.html#vehicles">Автомобили</a>
+    <a href="index.html#services">Сервисы</a>
+    <a href="index.html#featured">Рекомендуемое</a>
+    <a href="index.html#reviews">Отзывы</a>
+    <a href="index.html#contact">Контакт</a>
+  </nav>
+  <!-- Корзина (добавлено!) -->
+  <div id="cart-bar" style="float:right; margin-right:20px;">
+    <a href="cart.html" style="color:#222;">
+      <i class="fas fa-shopping-cart"></i>
+      <span id="cart-counter">0</span>
+    </a>
+  </div>
+</header>
+
+<div class="filters-bar">
+  <div class="filter-group">
+    <label for="category-select">Категория</label>
+    <select id="category-select"><option value="all">Все категории</option></select>
+  </div>
+  <div class="filter-group">
+    <label for="brand-select">Бренд</label>
+    <select id="brand-select"><option value="all">Все бренды</option></select>
+  </div>
+  <div class="filter-group">
+    <label for="stock-select">Наличие</label>
+    <select id="stock-select">
+      <option value="all">Все товары</option>
+      <option value="in-stock">В наличии</option>
+      <option value="low-stock">Мало на складе</option>
+      <option value="out-of-stock">Нет в наличии</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label for="sort-select">Сортировка</label>
+    <select id="sort-select">
+      <option value="default">По умолчанию</option>
+      <option value="price-asc">Цена ↑</option>
+      <option value="price-desc">Цена ↓</option>
+      <option value="name-asc">Название А→Я</option>
+      <option value="name-desc">Название Я→А</option>
+    </select>
+  </div>
+</div>
+
+<div class="catalog" id="parts-catalog"></div>
+</section>
+
+<!-- Chart.js для графика анализа -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- твой script.js -->
+<script src="script.js"></script>
+
+<!-- Firebase: вставь прямо сюда перед закрывающим </body> -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
+<script>
+  // Твой конфиг — всё уже готово!
+  const firebaseConfig = {
+    apiKey: "AIzaSyAjVd0NGBE3_r4Ot9phZ-SzIhWMyEYNfrw",
+    authDomain: "autopro-e3161.firebaseapp.com",
+    projectId: "autopro-e3161",
+    storageBucket: "autopro-e3161.firebasestorage.app",
+    messagingSenderId: "274244574652",
+    appId: "1:274244574652:web:012f0b403667f98b5c1fb9",
+    measurementId: "G-G0FH4XQTCC"
+  };
+  firebase.initializeApp(firebaseConfig);
+</script>
+
+<!-- Корзина: логика добавления и счетчика (оставь этот код, если ещё нет в script.js) -->
+<script>
+  function getCart() {
+    return JSON.parse(localStorage.getItem('cart')) || [];
+  }
+  function updateCartCounter() {
+    const cart = getCart();
+    let total = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+    const el = document.getElementById('cart-counter');
+    if (el) el.innerText = total;
+  }
+  document.addEventListener('DOMContentLoaded', updateCartCounter);
+
+  // Чтобы добавить товар в корзину:
+  // addToCart({id: "123", title: "Название", qty: 1, price: 999});
+  function addToCart(item) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let idx = cart.findIndex(i => i.id === item.id);
+    if (idx !== -1) {
+      cart[idx].qty += item.qty;
+    } else {
+      cart.push(item);
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCounter();
+    alert('Товар добавлен в корзину!');
+  }
+</script>
+</body>
+</html>
