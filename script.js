@@ -1,3 +1,17 @@
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAjVd0NGBE3_r4Ot9phZ-SzIhWMyEYNfrw",
+  authDomain: "autopro-e3161.firebaseapp.com",
+  projectId: "autopro-e3161",
+  storageBucket: "autopro-e3161.appspot.com",
+  messagingSenderId: "274244574652",
+  appId: "1:274244574652:web:012f0b403667f98b5c1fb9",
+  measurementId: "G-G0FH4XQTCC"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+
 /* --- Бургер-меню --- */
 const menuBtn = document.querySelector('#menu-btn');
 const navbar  = document.querySelector('.navbar');
@@ -381,3 +395,30 @@ function showAnalysis(id) {
 
 // --- Конец ---
 
+// Обработка логина/логаута
+document.getElementById('login-btn').onclick = function() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider)
+    .then(result => {
+      // Успех!
+      location.reload();
+    })
+    .catch(error => alert(error.message));
+};
+
+document.getElementById('logout-btn').onclick = function() {
+  auth.signOut().then(() => location.reload());
+};
+
+// Показывать кнопки в зависимости от авторизации
+auth.onAuthStateChanged(user => {
+  if (user) {
+    document.getElementById('login-btn').style.display = 'none';
+    document.getElementById('logout-btn').style.display = '';
+    document.getElementById('user-email').textContent = user.email;
+  } else {
+    document.getElementById('login-btn').style.display = '';
+    document.getElementById('logout-btn').style.display = 'none';
+    document.getElementById('user-email').textContent = '';
+  }
+});

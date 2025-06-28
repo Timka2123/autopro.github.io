@@ -21,14 +21,23 @@
     <a href="index.html#reviews">Отзывы</a>
     <a href="index.html#contact">Контакт</a>
   </nav>
-  <!-- Корзина (добавлено!) -->
-  <div id="cart-bar" style="float:right; margin-right:20px;">
-    <a href="cart.html" style="color:#222;">
-      <i class="fas fa-shopping-cart"></i>
-      <span id="cart-counter">0</span>
-    </a>
+  <div style="display: flex; align-items: center; gap: 20px; float:right;">
+    <!-- Корзина -->
+    <div id="cart-bar">
+      <a href="cart.html" style="color:#222;">
+        <i class="fas fa-shopping-cart"></i>
+        <span id="cart-counter">0</span>
+      </a>
+    </div>
+    <!-- Авторизация -->
+    <div id="user-controls">
+      <button id="login-btn">Войти</button>
+      <button id="logout-btn" style="display:none;">Выйти</button>
+      <span id="user-email"></span>
+    </div>
   </div>
 </header>
+
 
 <div class="filters-bar">
   <div class="filter-group">
