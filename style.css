@@ -3,7 +3,7 @@
 :root{
     --yellow:#f9d806;
     --light-yellow:#ffee80;
-    --black:#130f40;
+    --black:#fff;
     --light-color:#666;
     --box-shadow:0 .5rem 1rem rgba(0,0,0,.1);
     --border:.1rem solid rgba(0,0,0,.1);
@@ -1518,13 +1518,13 @@ section{
 
 /* Модальное окно авторизации */
 .auth-modal {
-  display: none;
   position: fixed;
-  z-index: 10010;
-  left: 0; top: 0; width: 100vw; height: 100vh;
+  top: 0; left: 0; width: 100vw; height: 100vh;
   background: rgba(18,19,20,0.85);
+  display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10010;
 }
 .auth-modal.show {
   display: flex !important;
@@ -1656,7 +1656,7 @@ section{
 body.dark, [data-theme="dark"] {
   --main-text: #fff;      /* тёмная тема — белый */
   --main-bg: #18191a;
-  /* ...другие переменные... */
+  
 }
 
 body, .heading, h1, h2, h3, h4, h5, h6,
@@ -1668,5 +1668,13 @@ body, .heading, h1, h2, h3, h4, h5, h6,
 .footer .box-container .box h3,
 .footer .credit
 {
+  color: var(--main-text) !important;
+}
+
+.auth-modal-content,
+.auth-modal-content h2,
+.auth-modal-content label,
+.auth-modal-content input,
+.auth-modal-content button {
   color: var(--main-text) !important;
 }
