@@ -7,6 +7,12 @@
     --light-color:#666;
     --box-shadow:0 .5rem 1rem rgba(0,0,0,.1);
     --border:.1rem solid rgba(0,0,0,.1);
+    --main-text:#fff;
+}
+
+body.dark, [data-theme="dark"] {
+  --black: #fff;
+  --main-text: #fff;
 }
 
 *{
@@ -99,7 +105,7 @@ section{
 .header{
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   position: fixed;
   top: 0; left: 0; right: 0;
   padding: 3rem 9%;
@@ -111,10 +117,13 @@ section{
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%);
   display: flex;
   align-items: center;
-  gap: 2.3rem
+  gap: 2.3rem;
+  justify-content: center;
+  flex: 1 1 auto;
+  margin: 0 auto;
 }
 
 
@@ -1230,6 +1239,14 @@ section{
     .filter-btn {
         grid-column: 1;
     }
+    .header .navbar {
+    /* если absolute, то центруем явно: */
+    left: 50%;
+    transform: translateX(-50%);
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
 }
 
 .analysis-tooltip {
