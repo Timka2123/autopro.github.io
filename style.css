@@ -105,36 +105,31 @@ section{
 .header{
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   position: fixed;
   top: 0; left: 0; right: 0;
-  padding: 3rem 9%;
+  padding: 2rem 8vw;
   z-index: 1000;
   background: #fff;
 }
 
 .header .navbar {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%);
+  flex: 1 1 auto;
   display: flex;
   align-items: center;
-  gap: 2.3rem;
   justify-content: center;
-  flex: 1 1 auto;
-  margin: 0 auto;
+  gap: 2.3rem;
+  position: static;   /* Убери absolute/left/top!!! */
+  transform: none;    /* Убери transform!!! */
+  margin: 0;
 }
 
 
 .header .logo{
-    font-size: 2.5rem;
-    color:var(--black);
-    font-weight: bold;
-    flex: 0 0 auto;
-    margin-right: 0;
-    margin-left: 0;
-    z-index: 2;
+  flex: 0 0 auto;
+  margin-right: 2.5rem;
+  font-size: 2.5rem;
+  font-weight: bold;
 }
 
 .header .logo span{
@@ -186,13 +181,13 @@ section{
 }
 
 #user-controls {
-    flex: 0 0 auto;
-    margin-left: 2rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 210px;
-    z-index: 2;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 210px;
+  margin-left: 2rem;
+  justify-content: flex-end;
 }
 
 .login-form-container{
@@ -724,7 +719,7 @@ section{
 @media (max-width:768px){
 
     #menu-btn{
-        display: block;
+        display: none;
     }
 
     #menu-btn.fa-times{
@@ -738,16 +733,30 @@ section{
     #login-btn i{
         display: block;
     }
-
+    .header {
+    flex-wrap: wrap;
+    padding: 1rem 2vw;
+  }
+    .header .navbar {
+    flex-direction: column;
+    position: static;
+    transform: none;
+    background: transparent;
+    width: 100%;
+    display: flex !important; /* Всегда показывать */
+    justify-content: center;
+    align-items: center;
+  }
 
     .header .navbar.active{
         clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+        display: flex;
     }
 
     .header .navbar a{
-        margin:2rem;
-        display: block;
-        font-size: 2rem;
+      margin:1.2rem 0;
+      display: block;
+      font-size: 2rem;
     }
 
 }
