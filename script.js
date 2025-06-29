@@ -27,17 +27,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // --- Открытие и закрытие модального окна ---
   loginBtn.onclick = () => {
-    authModal.style.display = "block";
-    loginForm.style.display = "block";
-    registerForm.style.display = "none";
-    authMessage.textContent = "";
-    regMessage.textContent = "";
-  };
-  closeAuth.onclick = () => {
-    authModal.style.display = "none";
-    authMessage.textContent = "";
-    regMessage.textContent = "";
-  };
+  authModal.classList.add('show');
+  loginForm.style.display = "block";
+  registerForm.style.display = "none";
+  authMessage.textContent = "";
+  regMessage.textContent = "";
+};
+
+closeAuth.onclick = () => {
+  authModal.classList.remove('show');
+  authMessage.textContent = "";
+  regMessage.textContent = "";
+};
+
+
 
   // --- Переключение форм ---
   showRegisterBtn.onclick = () => {
