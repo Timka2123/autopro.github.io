@@ -99,7 +99,7 @@ section{
 .header{
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     position: fixed;
     top:0; left:0; right:0;
     padding:3rem 9%;
@@ -112,6 +112,7 @@ section{
     color:var(--black);
     font-weight: bold;
     flex: 0 0 auto;
+    margin-right: auto;
 }
 
 .header .logo span{
@@ -124,6 +125,7 @@ section{
   align-items: center;
   justify-content: flex-end;
   flex: 0 0 auto;
+  margin-left: auto;
 }
 
 
@@ -1679,39 +1681,7 @@ body, .heading, h1, h2, h3, h4, h5, h6,
   color: var(--main-text) !important;
 }
 
-@media (prefers-color-scheme: dark), body.dark, [data-theme="dark"] {
 
-  body, .heading, h1, h2, h3, h4, h5, h6,
-  .services .box-container .box h3,
-  .services .heading,
-  .featured .featured-slider .box .content h3,
-  .vehicles .vehicles-slider .box .content h3,
-  .contact .row form h3,
-  .footer .box-container .box h3,
-  .footer .credit,
-  .auth-modal-content,
-  .auth-modal-content h2,
-  .auth-modal-content label,
-  .auth-modal-content input,
-  .auth-modal-content button {
-    color: #fff !important;
-    background: #18191a !important;
-  }
-
-  .login-form-container form,
-  .auth-modal-content {
-    background: #18191a !important;
-    color: #fff !important;
-  }
-
-  .login-form-container form .box,
-  .auth-modal-content input[type="email"],
-  .auth-modal-content input[type="password"] {
-    background: #232323 !important;
-    color: #fff !important;
-    border: 1px solid #444 !important;
-  }
-}
 
 
 
