@@ -1722,14 +1722,17 @@ section{
 
 .auth-modal {
   position: fixed;
-  left: 0; top: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(18, 19, 20, 0.85); /* затемнение */
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(18,19,20,0.85);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10010;
 }
+
 .auth-modal-content {
   background: #18191a;
   color: #fff;
@@ -1852,15 +1855,4 @@ section{
   }
 }
 
-.auth-modal {
-  position: fixed !important;
-  left: 0 !important;
-  top: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  background: rgba(18,19,20,0.85) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  z-index: 10010 !important;
-}
+
