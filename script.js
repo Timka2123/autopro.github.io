@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // 1. Firebase config:
+  // --- Firebase config ---
   const firebaseConfig = {
     apiKey: "AIzaSyAjVd0NGBE3_r4Ot9phZ-SzIhWMyEYNfrw",
     authDomain: "autopro-e3161.firebaseapp.com",
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
 
-  // 2. Обработка логина/логаута:
+  // --- Авторизация ---
   const loginBtn = document.getElementById('login-btn');
   const logoutBtn = document.getElementById('logout-btn');
   const userEmail = document.getElementById('user-email');
@@ -43,8 +43,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-
-  // --- Остальной твой код (бургер, каталог, swiper, т.д.) ---
 });
 
 
@@ -426,31 +424,5 @@ function showAnalysis(id) {
 
 // --- Конец ---
 
-// Обработка логина/логаута
-document.getElementById('login-btn').onclick = function() {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider)
-    .then(result => {
-      // Успех!
-      location.reload();
-    })
-    .catch(error => alert(error.message));
-};
 
-document.getElementById('logout-btn').onclick = function() {
-  auth.signOut().then(() => location.reload());
-};
-
-// Показывать кнопки в зависимости от авторизации
-auth.onAuthStateChanged(user => {
-  if (user) {
-    document.getElementById('login-btn').style.display = 'none';
-    document.getElementById('logout-btn').style.display = '';
-    document.getElementById('user-email').textContent = user.email;
-  } else {
-    document.getElementById('login-btn').style.display = '';
-    document.getElementById('logout-btn').style.display = 'none';
-    document.getElementById('user-email').textContent = '';
-  }
-});
 
