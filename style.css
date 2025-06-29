@@ -109,6 +109,15 @@ section{
     /* min-width: 360px; — если нужен минимальный размер */
 }
 
+.header .navbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
+    gap: 2.3rem;
+}
+
+
 .header .logo{
     font-size: 2.5rem;
     color:var(--black);
@@ -1669,31 +1678,7 @@ section{
   margin-top: 0.5rem;
 }
 
-body.dark, [data-theme="dark"] {
-  --main-text: #fff;      /* тёмная тема — белый */
-  --main-bg: #18191a;
-  
-}
 
-body, .heading, h1, h2, h3, h4, h5, h6,
-.services .box-container .box h3,
-.services .heading,
-.featured .featured-slider .box .content h3,
-.vehicles .vehicles-slider .box .content h3,
-.contact .row form h3,
-.footer .box-container .box h3,
-.footer .credit
-{
-  color: var(--main-text) !important;
-}
-
-.auth-modal-content,
-.auth-modal-content h2,
-.auth-modal-content label,
-.auth-modal-content input,
-.auth-modal-content button {
-  color: var(--main-text) !important;
-}
 
 
 
