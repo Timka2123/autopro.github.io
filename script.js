@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // --- Firebase config ---
+  // --- Инициализация Firebase ---
   const firebaseConfig = {
     apiKey: "AIzaSyAjVd0NGBE3_r4Ot9phZ-SzIhWMyEYNfrw",
     authDomain: "autopro-e3161.firebaseapp.com",
@@ -12,38 +12,84 @@ document.addEventListener('DOMContentLoaded', function() {
   if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
 
-  // --- Авторизация ---
+  // --- Модалка логина ---
+  const authModal = document.getElementById('auth-modal');
   const loginBtn = document.getElementById('login-btn');
   const logoutBtn = document.getElementById('logout-btn');
   const userEmail = document.getElementById('user-email');
 
+  const authLoginBtn = document.getElementById('auth-login-btn');
+  const authRegisterBtn = document.getElementById('auth-register-btn');
+  const authEmail = document.getElementById('auth-email');
+  const authPass = document.getElementById('auth-pass');
+  const authMsg = document.getElementById('auth-message');
+  const closeAuth = document.getElementById('close-auth');
+
+  // Открыть форму
   if (loginBtn) {
     loginBtn.onclick = function() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider)
-        .then(() => location.reload())
-        .catch(error => alert(error.message));
-    };
+      authModal.style.display = 'block';
+      authMsg.textContent = '';
+    }
   }
+  // Закрыть форму
+  if (closeAuth) {
+    closeAuth.onclick = function() {
+      authModal.style.display = 'none';
+    }
+  }
+
+  // Вход по email
+  if (authLoginBtn) {
+    authLoginBtn.onclick = function() {
+      auth.signInWithEmailAndPassword(authEmail.value, authPass.value)
+        .then(() => {
+          authModal.style.display = 'none';
+          authMsg.textContent = '';
+        })
+        .catch(err => {
+          authMsg.textContent = err.message;
+        });
+    }
+  }
+  // Регистрация
+  if (authRegisterBtn) {
+    authRegisterBtn.onclick = function() {
+      auth.createUserWithEmailAndPassword(authEmail.value, authPass.value)
+        .then(() => {
+          authMsg.textContent = "Успешно! Войдите.";
+        })
+        .catch(err => {
+          authMsg.textContent = err.message;
+        });
+    }
+  }
+  // Выход
   if (logoutBtn) {
     logoutBtn.onclick = function() {
-      auth.signOut().then(() => location.reload());
-    };
+      auth.signOut();
+    }
   }
-  if (loginBtn && logoutBtn && userEmail) {
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        loginBtn.style.display = 'none';
-        logoutBtn.style.display = '';
-        userEmail.textContent = user.email;
-      } else {
-        loginBtn.style.display = '';
-        logoutBtn.style.display = 'none';
-        userEmail.textContent = '';
-      }
-    });
+  // Отображение кнопок
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      loginBtn.style.display = 'none';
+      logoutBtn.style.display = '';
+      userEmail.textContent = user.email;
+      if (authModal) authModal.style.display = 'none';
+    } else {
+      loginBtn.style.display = '';
+      logoutBtn.style.display = 'none';
+      userEmail.textContent = '';
+    }
+  });
+
+  // Клик вне формы закрывает окно
+  window.onclick = function(event) {
+    if (event.target === authModal) authModal.style.display = 'none';
   }
 });
+
 
 
 /* --- Бургер-меню --- */
