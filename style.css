@@ -1514,7 +1514,7 @@ section{
 .auth-modal.show { display: flex; }
 
 .auth-form {
-  background: #fff;
+  background: #1a1d1e;
   border-radius: 14px;
   padding: 32px 24px 18px 24px;
   width: 320px;
@@ -1878,4 +1878,121 @@ section{
   background: #222325;
   color: #fff;
   box-sizing: border-box;
+}
+
+:root {
+  --yellow: #f9d806;
+  --orange: #f98a06;
+  --modal-bg-dark: #18191a;
+  --modal-bg-light: #fff;
+  --modal-text-dark: #fff;
+  --modal-text-light: #18191a;
+  --modal-border-radius: 1.3rem;
+  --btn-yellow-gradient: linear-gradient(90deg, #ffe259 0%, #f9d806 100%);
+  --btn-yellow-gradient-hover: linear-gradient(90deg, #f9d806 0%, #f98a06 100%);
+  --btn-text-dark: #222;
+  --btn-text-light: #18191a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --modal-bg: var(--modal-bg-dark);
+    --modal-text: var(--modal-text-dark);
+    --btn-text: var(--btn-text-dark);
+  }
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --modal-bg: var(--modal-bg-light);
+    --modal-text: var(--modal-text-light);
+    --btn-text: var(--btn-text-light);
+  }
+}
+
+/* Модальное окно */
+.auth-modal-content {
+  background: var(--modal-bg, #18191a);
+  color: var(--modal-text, #fff);
+  border-radius: var(--modal-border-radius);
+  box-shadow: 0 2px 32px #000b, 0 0 16px 0 #232323;
+  padding: 2.2rem 2.4rem 2.4rem 2.4rem;
+  min-width: 330px;
+  width: 98vw;
+  max-width: 370px;
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Кнопки "Войти" и "Регистрация" одинаково */
+.auth-modal-content .btn {
+  width: 100%;
+  margin-top: 1.1rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.7rem;
+  cursor: pointer;
+  padding: 0.95rem 0;
+  background: var(--btn-yellow-gradient);
+  color: var(--btn-text, #222);
+  transition: background 0.18s, color 0.18s, box-shadow 0.13s;
+  box-shadow: 0 3px 9px #f9d8061f;
+  letter-spacing: 0.02em;
+  text-align: center;
+  outline: none;
+  display: block;
+}
+
+.auth-modal-content .btn:hover {
+  background: var(--btn-yellow-gradient-hover);
+  color: var(--btn-text, #fff);
+}
+
+.auth-modal-content .btn:active,
+.auth-modal-content .btn:focus {
+  background: var(--btn-yellow-gradient);
+  color: var(--btn-text, #222);
+  outline: 2px solid var(--yellow);
+}
+
+/* Текст в модалке — заголовок и поля */
+.auth-modal-content h2,
+.auth-modal-content h3 {
+  color: var(--yellow);
+  font-weight: bold;
+  margin-bottom: 1.4rem;
+  text-align: center;
+}
+
+.auth-modal-content input[type="email"],
+.auth-modal-content input[type="password"] {
+  width: 100%;
+  padding: 1rem 1.2rem;
+  border-radius: 0.8rem;
+  border: 1px solid #ccc;
+  margin-bottom: 1.3rem;
+  font-size: 1.15rem;
+  background: #dde0e7;
+  color: #18191a;
+  box-sizing: border-box;
+}
+
+/* Чтобы меню было по центру экрана (если auth-modal – fixed и 100vw/100vh) */
+.auth-modal {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Для небольших экранов */
+@media (max-width: 500px) {
+  .auth-modal-content {
+    padding: 1.2rem;
+    min-width: 0;
+    width: 98vw;
+    max-width: 99vw;
+  }
 }
