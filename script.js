@@ -63,7 +63,7 @@ closeAuth.onclick = () => {
     const pass = document.getElementById('auth-pass').value;
     auth.signInWithEmailAndPassword(email, pass)
       .then(() => {
-        authModal.style.display = "none";
+        authModal.classList.remove('show');
         location.reload();
       })
       .catch(e => authMessage.textContent = e.message);
@@ -85,7 +85,7 @@ closeAuth.onclick = () => {
     }
     auth.createUserWithEmailAndPassword(email, pass1)
       .then(() => {
-        authModal.style.display = "none";
+        authModal.classList.remove('show');
         location.reload();
       })
       .catch(e => regMessage.textContent = e.message);
