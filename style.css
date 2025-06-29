@@ -1724,46 +1724,53 @@ section{
   position: fixed;
   left: 0; top: 0;
   width: 100vw; height: 100vh;
-  background: rgba(20,20,20, 0.8); /* тёмный полупрозрачный фон */
+  background: rgba(18, 19, 20, 0.85); /* Полупрозрачный тёмный фон */
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 10010;
 }
 .auth-modal-content {
-  background: #18191a; /* основной фон сайта! */
+  background: #18191a; /* Цвет основного сайта */
   color: #fff;
-  border-radius: 1.2rem;
-  box-shadow: 0 0 20px 0 #000a, 0 8px 32px #000a;
+  border-radius: 1.3rem;
+  box-shadow: 0 2px 32px #000b, 0 0 16px 0 #232323;
   padding: 2.2rem 2.4rem 2.4rem 2.4rem;
+  min-width: 330px;
+  width: 98vw;
   max-width: 370px;
-  width: 96vw;
-  min-width: 270px;
   text-align: center;
   position: relative;
 }
 .auth-modal-content h2 {
-  font-size: 2.4rem;
-  color: #f9d806; /* Жёлтый цвет как на сайте */
+  font-size: 2.2rem;
+  color: #f9d806; /* Жёлтый */
   margin-bottom: 1.2rem;
 }
 .auth-modal-content input[type="email"],
 .auth-modal-content input[type="password"] {
   width: 100%;
   padding: 1rem 1.2rem;
-  border-radius: 0.6rem;
+  border-radius: 0.8rem;
   border: 1px solid #393939;
-  margin-bottom: 1.2rem;
-  font-size: 1.4rem;
-  background: #24262b;
+  margin-bottom: 1.3rem;
+  font-size: 1.25rem;
+  background: #222325;
   color: #fff;
   box-sizing: border-box;
+  transition: border 0.15s;
 }
+
+.auth-modal-content input:focus {
+  border: 1.5px solid #f9d806;
+  outline: none;
+}
+
 .auth-actions {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-top: 0.8rem;
+  gap: 1.1rem;
+  margin-top: 0.7rem;
 }
 .btn.yellow {
   background: linear-gradient(90deg, #f9d806 0%, #ffe259 100%);
@@ -1771,10 +1778,18 @@ section{
   font-weight: 600;
   border: none;
   border-radius: 0.7rem;
-  font-size: 1.3rem;
-  padding: 0.9rem 1.2rem;
+  font-size: 1.15rem;
+  padding: 0.95rem 0;
   cursor: pointer;
+  width: 100%;
+  transition: box-shadow 0.13s, background 0.13s;
+  box-shadow: 0 3px 9px #f9d8061f;
 }
+
+.btn.yellow:hover {
+  background: linear-gradient(90deg, #ffe259 0%, #f9d806 100%);
+}
+
 .btn.btn-alt {
   background: #393939;
   color: #fff;
@@ -1782,9 +1797,10 @@ section{
 }
 .auth-message {
   min-height: 1.5rem;
-  margin-top: 0.6rem;
+  margin-top: 0.7rem;
   color: #e74c3c;
-  font-size: 1.2rem;
+  font-size: 1.13rem;
+  text-align: center;
 }
 .close {
   position: absolute;
@@ -1795,7 +1811,7 @@ section{
   cursor: pointer;
   background: none;
   border: none;
-  z-index: 1001;
+  z-index: 101;
 }
 @media (max-width: 500px) {
   .auth-modal-content {
@@ -1807,12 +1823,28 @@ section{
 }
 
 .btn.btn-alt, .auth-modal-content .btn:not(.yellow) {
-  background: #222;
+   background: #232323;
   color: #fff;
-  border: 1px solid #555;
+  border: 1.5px solid #f9d806;
   font-weight: 600;
   border-radius: 0.7rem;
-  font-size: 1.3rem;
-  padding: 0.9rem 1.2rem;
+  font-size: 1.15rem;
+  padding: 0.95rem 0;
   cursor: pointer;
+  width: 100%;
+  transition: box-shadow 0.13s, background 0.13s;
+}
+
+.btn.btn-alt:hover {
+  background: #292929;
+}
+
+@media (prefers-color-scheme: light) {
+  .auth-modal-content {
+    background: #fff;
+    color: #18191a;
+  }
+  .btn.yellow {
+    color: #222;
+  }
 }
