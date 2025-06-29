@@ -3,7 +3,7 @@
 :root{
     --yellow:#f9d806;
     --light-yellow:#ffee80;
-    --black:#fff;
+    --black:#222;
     --light-color:#666;
     --box-shadow:0 .5rem 1rem rgba(0,0,0,.1);
     --border:.1rem solid rgba(0,0,0,.1);
@@ -97,24 +97,24 @@ section{
 }
 
 .header{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: fixed;
-    top:0; left:0; right:0;
-    padding: 3rem 9%;
-    z-index: 1000;
-    background: #fff;
-    width: 100%;
-    /* min-width: 360px; — если нужен минимальный размер */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  padding: 3rem 9%;
+  z-index: 1000;
+  background: #fff;
 }
 
 .header .navbar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 1 1 auto;
-    gap: 2.3rem;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 2.3rem
 }
 
 
@@ -123,7 +123,9 @@ section{
     color:var(--black);
     font-weight: bold;
     flex: 0 0 auto;
-    margin-right: 2rem;;
+    margin-right: 0;
+    margin-left: 0;
+    z-index: 2;
 }
 
 .header .logo span{
@@ -181,6 +183,7 @@ section{
     align-items: center;
     gap: 10px;
     min-width: 210px;
+    z-index: 2;
 }
 
 .login-form-container{
@@ -703,6 +706,9 @@ section{
     section{
         padding:2rem;
     }
+    .header .navbar {
+    justify-content: center;
+  }
 
 }
 
@@ -724,18 +730,6 @@ section{
         display: block;
     }
 
-    .header .navbar{
-        position: absolute;
-        top:99%; left:0; right:0;
-        background: #fff;
-        border-top: var(--border);
-        clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
-        flex: 1 1 auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 2.3rem;
-    }
 
     .header .navbar.active{
         clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
@@ -1522,6 +1516,7 @@ section{
 @media (max-width: 991px) {
   .filters-bar {
     margin-top: 7rem; /* если на малых экранах шапка ниже */
+    padding: 2rem;
   }
 }
 
