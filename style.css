@@ -67,12 +67,12 @@ section{
   transition: background 0.2s, color 0.2s;
 }
 .btn:hover, .btn:focus {
-  background: linear-gradient(90deg, #f98a06 0%, #f9d806 100%);
+  background: linear-gradient(90deg, #f9d806 0%, #f9d806 100%);
   color: #fff;
 }
 
 .btn:active, .btn:focus {
-  background: linear-gradient(90deg, #f9d806 0%, #f98a06 100%) !important;
+  background: linear-gradient(90deg, #f9d806 0%, #f9d806 100%) !important;
   color: #fff !important;
   outline: none !important;
   box-shadow: none !important;
@@ -1467,3 +1467,19 @@ section{
   }
 }
 
+.auth-modal {
+  position: fixed; left:0; top:0; width:100vw; height:100vh;
+  background: rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index: 10000;
+}
+.auth-content {
+  background: #222; color: #fff; padding: 32px 24px; border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.4); min-width: 320px; max-width: 90vw;
+  text-align: center;
+}
+.auth-content input {
+  padding: 10px; width: 90%; margin: 8px 0; border-radius: 6px; border: 1px solid #666;
+  background: #1a1a1a; color: #fff;
+}
+.auth-content button.btn {
+  margin: 10px 8px 0 8px; min-width: 100px;
+}

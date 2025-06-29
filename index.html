@@ -38,29 +38,21 @@
         <i class="far fa-user"></i>
     </div>
 
-
 </header>
 
     
-<!--<div class="login-form-container">
-
-    <span id="close-login-form" class="fas fa-times"></span>
-
-    <form action="">
-        <h3>user login</h3>
-        <input type="email" placeholder="email" class="box">
-        <input type="password" placeholder="password" class="box">
-        <p> forget your password <a href="#">click here</a> </p>
-        <input type="submit" value="login" class="btn">
-        <p>or login with</p>
-        <div class="buttons">
-            <a href="#" class="btn"> google </a>
-            <a href="#" class="btn"> facebook </a>
+<!-- Модальное окно авторизации -->
+    <div id="auth-modal" class="auth-modal" style="display:none;">
+        <div class="auth-content">
+            <span id="close-auth" style="float:right; cursor:pointer;">&times;</span>
+                <h2>Вход / Регистрация</h2>
+                <input type="email" id="auth-email" placeholder="E-mail" /><br>
+                <input type="password" id="auth-pass" placeholder="Пароль" /><br>
+                <button id="auth-login-btn" class="btn">Войти</button>
+                <button id="auth-register-btn" class="btn">Регистрация</button>
+            <div id="auth-message" style="color:#f00;margin:10px 0;"></div>
         </div>
-        <p> don't have an account <a href="#">create one</a> </p>
-    </form>
-
-</div>-->
+    </div>
 
 <section class="home" id="home">
 
@@ -606,18 +598,12 @@
 
 </section>
 
-
-
-
-
-
-
-
-
-
 <script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
 <script src="script.js"></script>
+
+
+
 </body>
 </html>
