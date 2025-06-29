@@ -1502,16 +1502,18 @@ section{
 
 :root {
   --yellow: #f9d806;
-  --orange: #f98a06;
+  --orange: #f9d806;
   --modal-bg-dark: #18191a;
   --modal-bg-light: #fff;
   --modal-text-dark: #fff;
   --modal-text-light: #18191a;
   --modal-border-radius: 1.2rem;
   --btn-yellow-gradient: linear-gradient(90deg, #ffe259 0%, #f9d806 100%);
-  --btn-yellow-gradient-hover: linear-gradient(90deg, #f9d806 0%, #f98a06 100%);
+  --btn-yellow-gradient-hover: linear-gradient(90deg, #f9d806 0%, #f9d806 100%);
   --btn-text-dark: #222;
   --btn-text-light: #18191a;
+  --main-text: #130f40;   /* светлая тема — синий */
+  --main-bg: #f4f4f4;
 }
 
 /* Модальное окно авторизации */
@@ -1651,4 +1653,20 @@ section{
   margin-top: 0.5rem;
 }
 
+body.dark, [data-theme="dark"] {
+  --main-text: #fff;      /* тёмная тема — белый */
+  --main-bg: #18191a;
+  /* ...другие переменные... */
+}
 
+body, .heading, h1, h2, h3, h4, h5, h6,
+.services .box-container .box h3,
+.services .heading,
+.featured .featured-slider .box .content h3,
+.vehicles .vehicles-slider .box .content h3,
+.contact .row form h3,
+.footer .box-container .box h3,
+.footer .credit
+{
+  color: var(--main-text) !important;
+}
