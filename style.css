@@ -1794,3 +1794,88 @@ section{
   font-size: 1.35rem;
 }
 
+.auth-actions .btn, 
+.auth-modal-content button,
+.auth-modal-content input[type="submit"] {
+  background: linear-gradient(90deg, #f9d806 0%, #f98a06 100%);
+  color: #222;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  padding: 0.9em 0;
+  font-size: 1.25em;
+  width: 100%;
+  margin-top: 1.1em;
+  transition: background 0.2s, color 0.2s;
+  box-shadow: 0 3px 12px #f9d80622;
+}
+
+.auth-actions .btn:hover,
+.auth-modal-content button:hover,
+.auth-modal-content input[type="submit"]:hover {
+  background: linear-gradient(90deg, #ffe259 0%, #f9d806 100%);
+  color: #18191a;
+}
+
+/* Для кнопки регистрации тоже, если вдруг отдельно */
+#auth-register-btn, #auth-login-btn {
+  background: linear-gradient(90deg, #f9d806 0%, #f98a06 100%);
+  color: #222;
+}
+
+.auth-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  width: 100%;
+  align-items: center;
+  margin-top: 1.2em;
+}
+
+.auth-actions .btn {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  margin-top: 0;
+}
+
+.auth-modal-content {
+  background: #18191a !important;
+  color: #ffe259 !important;
+  border-radius: 1.3rem;
+  box-shadow: 0 2px 32px #000b, 0 0 16px 0 #232323;
+  padding: 2.2rem 2.4rem 2.4rem 2.4rem;
+  min-width: 330px;
+  width: 98vw;
+  max-width: 370px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.auth-modal {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(18,19,20,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10010;
+}
+
+.auth-modal-content input[type="email"],
+.auth-modal-content input[type="password"] {
+  width: 100%;
+  padding: 1rem 1.2rem;
+  border-radius: 0.8rem;
+  border: 1px solid #393939;
+  margin-bottom: 1.3rem;
+  font-size: 1.15em;
+  background: #222325;
+  color: #fff;
+  box-sizing: border-box;
+}
