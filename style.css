@@ -433,4 +433,156 @@ section { padding: 2rem 9%; }
   font-size: 1.8rem;
   margin-bottom: 1.5rem;
   color: var(--yellow);
+  text-align: center;
+}
+.chart-container {
+  position: relative;
+  height: 250px;
+  width: 100%;
+  margin: 1rem 0;
+}
+.chartjs-tooltip {
+  background: rgba(19, 15, 64, 0.9) !important;
+  border: 1px solid var(--yellow) !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem 1rem !important;
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1) !important;
+  opacity: 1 !important;
+  transition: all 0.3s ease !important;
+}
+.chartjs-tooltip-header {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: var(--yellow);
+}
+.chartjs-tooltip-body { font-size: 1.4rem; }
+
+/* ----------- AUTH MODAL ----------- */
+.auth-modal {
+  position: fixed;
+  left: 0; top: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(18,19,20,0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10010;
+}
+
+.auth-modal.show {
+  display: flex;
+}
+
+.auth-modal-content {
+  background: #18191a;
+  color: #fff;
+  border-radius: 1.3rem;
+  box-shadow: 0 2px 32px #000b, 0 0 16px 0 #232323;
+  padding: 2.2rem 2.4rem 2.4rem 2.4rem;
+  min-width: 330px;
+  width: 98vw; max-width: 370px;
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.auth-modal-content h2 {
+  font-size: 2.2rem;
+  color: #f9d806;
+  margin-bottom: 1.2rem;
+}
+.auth-modal-content input[type="email"], .auth-modal-content input[type="password"] {
+  width: 100%; padding: 1rem 1.2rem;
+  border-radius: 0.8rem; border: 1px solid #393939;
+  margin-bottom: 1.3rem; font-size: 1.25rem;
+  background: #222325; color: #fff;
+  box-sizing: border-box; transition: border 0.15s;
+}
+.auth-actions { display: flex; flex-direction: column; gap: 1.1rem; margin-top: 0.7rem; }
+.auth-message { min-height: 1.5rem; margin-top: 0.7rem; color: #e74c3c; font-size: 1.13rem; text-align: center; }
+.auth-modal-content .close, .close {
+  position: absolute; right: 1.2rem; top: 1rem;
+  font-size: 2.2rem; color: var(--black);
+  cursor: pointer; z-index: 2;
+}
+.close { color: #f9d806; background: none; border: none; z-index: 101; }
+
+/* ----------- USER CONTROLS ----------- */
+#user-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  min-width: 230px;
+  max-width: 350px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  justify-content: flex-end;
+}
+#user-email {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #ccc;
+  margin-left: 4px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* ----------- ADAPTIVE ----------- */
+@media (max-width: 991px) {
+  html { font-size: 55%; }
+  .header, .header.active { padding: 2rem; }
+  section { padding: 2rem; }
+  .filters-bar { margin-top: 7rem; }
+}
+@media (max-width: 900px) {
+  .filters-bar {
+    flex-direction: column;
+    gap: 18px 0;
+    padding: 1.5rem 1rem;
+  }
+  .filter-group { min-width: 0; width: 100%; flex: unset; }
+  .filter-group select { min-width: 0; width: 100%; max-width: none; }
+}
+@media (max-width: 768px) {
+  #menu-btn { display: block; }
+  #menu-btn.fa-times { transform: rotate(180deg); }
+  #login-btn .btn { display: none; }
+  #login-btn i { display: block; }
+  .header .navbar {
+    position: absolute; top: 99%; left: 0; right: 0;
+    background: #fff; border-top: var(--border);
+    clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+  }
+  .header .navbar.active {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+  }
+  .header .navbar a {
+    margin: 2rem; display: block; font-size: 2rem;
+  }
+  .filters-container, .filters-bar { grid-template-columns: 1fr; }
+  .filter-btn { grid-column: 1; }
+}
+@media (max-width: 500px) {
+  .auth-modal-content {
+    padding: 1.2rem;
+    min-width: 0;
+    width: 98vw;
+    max-width: 99vw;
+  }
+}
+@media (max-width: 450px) {
+  html { font-size: 50%; }
+  .heading { font-size: 3rem; }
+}
+@media (min-width: 0px) {
+  .filters-bar { margin-top: 8.5rem; }
+}
+@media (prefers-color-scheme: light) {
+  .auth-modal-content { background: #fff; color: #18191a; }
+  .btn.yellow { color: #222; }
 }
