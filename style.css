@@ -99,12 +99,14 @@ section{
 .header{
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     position: fixed;
     top:0; left:0; right:0;
-    padding:3rem 9%;
+    padding: 3rem 9%;
     z-index: 1000;
     background: #fff;
+    width: 100%;
+    /* min-width: 360px; — если нужен минимальный размер */
 }
 
 .header .logo{
@@ -112,7 +114,7 @@ section{
     color:var(--black);
     font-weight: bold;
     flex: 0 0 auto;
-    margin-right: auto;
+    margin-right: 2rem;;
 }
 
 .header .logo span{
@@ -125,7 +127,7 @@ section{
   align-items: center;
   justify-content: flex-end;
   flex: 0 0 auto;
-  margin-left: auto;
+  margin-left: 2rem;
 }
 
 
@@ -156,9 +158,20 @@ section{
 }
 
 #menu-btn{
+    margin-right: 2.2rem;
     font-size: 2.5rem;
     color:var(--light-color);
-    display: none;
+    cursor: pointer;
+    flex: 0 0 auto;
+}
+
+#user-controls {
+    flex: 0 0 auto;
+    margin-left: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 210px;
 }
 
 .login-form-container{
@@ -708,10 +721,11 @@ section{
         background: #fff;
         border-top: var(--border);
         clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
-        flex: 1;
+        flex: 1 1 auto;
         display: flex;
         justify-content: center;
         align-items: center;
+        gap: 2.3rem;
     }
 
     .header .navbar.active{
