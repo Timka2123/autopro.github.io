@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
 
-  // --- Модалка логина ---
+  // --- DOM-элементы ---
   const authModal = document.getElementById('auth-modal');
   const loginBtn = document.getElementById('login-btn');
   const logoutBtn = document.getElementById('logout-btn');
@@ -22,127 +22,89 @@ document.addEventListener('DOMContentLoaded', function() {
   const showRegisterBtn = document.getElementById('show-register-btn');
   const showLoginBtn = document.getElementById('show-login-btn');
   const regMessage = document.getElementById('reg-message');
+  const authMessage = document.getElementById('auth-message');
+  const userEmail = document.getElementById('user-email'); // если выводишь почту
 
+  // --- Открытие и закрытие модального окна ---
   loginBtn.onclick = () => {
     authModal.style.display = "block";
     loginForm.style.display = "block";
     registerForm.style.display = "none";
-};
-closeAuth.onclick = () => {
-    authModal.style.display = "none";
-    document.getElementById('auth-message').textContent = "";
+    authMessage.textContent = "";
     regMessage.textContent = "";
-};
-window.onclick = (e) => { if (e.target === authModal) authModal.style.display = "none"; };
+  };
+  closeAuth.onclick = () => {
+    authModal.style.display = "none";
+    authMessage.textContent = "";
+    regMessage.textContent = "";
+  };
 
-// --- Переключение форм
-showRegisterBtn.onclick = () => {
+  // --- Переключение форм ---
+  showRegisterBtn.onclick = () => {
     loginForm.style.display = "none";
     registerForm.style.display = "block";
-    document.getElementById('auth-message').textContent = "";
+    authMessage.textContent = "";
     regMessage.textContent = "";
-};
-showLoginBtn.onclick = () => {
+  };
+  
+  showLoginBtn.onclick = () => {
     loginForm.style.display = "block";
     registerForm.style.display = "none";
+    authMessage.textContent = "";
     regMessage.textContent = "";
-    document.getElementById('auth-message').textContent = "";
-};
+  };
 
-// --- Логика регистрации с проверкой пароля
-document.getElementById('auth-register-btn').onclick = () => {
-    const email = document.getElementById('reg-email').value.trim();
-    const pass1 = document.getElementById('reg-pass').value;
-    const pass2 = document.getElementById('reg-pass2').value;
-    if (pass1 !== pass2) {
-        regMessage.textContent = "Пароли не совпадают!";
-        return;
-    }
-    auth.createUserWithEmailAndPassword(email, pass1)
-        .then(() => location.reload())
-        .catch(e => regMessage.textContent = e.message);
-};
-
-// --- Логика входа
-document.getElementById('auth-login-btn').onclick = () => {
+  // --- Вход ---
+  document.getElementById('auth-login-btn').onclick = () => {
     const email = document.getElementById('auth-email').value.trim();
     const pass = document.getElementById('auth-pass').value;
     auth.signInWithEmailAndPassword(email, pass)
-        .then(() => location.reload())
-        .catch(e => document.getElementById('auth-message').textContent = e.message);
-};
+      .then(() => {
+        authModal.style.display = "none";
+        location.reload();
+      })
+      .catch(e => authMessage.textContent = e.message);
+  };
 
-// --- Логика выхода
-logoutBtn.onclick = () => {
-    auth.signOut().then(() => location.reload());
-};
+  // --- Регистрация с проверкой пароля ---
+  document.getElementById('auth-register-btn').onclick = () => {
+    const email = document.getElementById('reg-email').value.trim();
+    const pass1 = document.getElementById('reg-pass').value;
+    const pass2 = document.getElementById('reg-pass2').value;
+    regMessage.textContent = '';
+    if (pass1.length < 6) {
+      regMessage.textContent = "Пароль должен быть не менее 6 символов";
+      return;
+    }
+    if (pass1 !== pass2) {
+      regMessage.textContent = "Пароли не совпадают!";
+      return;
+    }
+    auth.createUserWithEmailAndPassword(email, pass1)
+      .then(() => {
+        authModal.style.display = "none";
+        location.reload();
+      })
+      .catch(e => regMessage.textContent = e.message);
+  };
 
-// --- Смена отображения кнопок
-auth.onAuthStateChanged(user => {
+  // --- Смена отображения кнопок и email ---
+  auth.onAuthStateChanged(user => {
     if (user) {
-        loginBtn.style.display = 'none';
-        logoutBtn.style.display = '';
-        document.getElementById('user-email').textContent = user.email;
+      loginBtn.style.display = 'none';
+      if (logoutBtn) logoutBtn.style.display = '';
+      if (userEmail) userEmail.textContent = user.email;
     } else {
-        loginBtn.style.display = '';
-        logoutBtn.style.display = 'none';
-        document.getElementById('user-email').textContent = '';
+      loginBtn.style.display = '';
+      if (logoutBtn) logoutBtn.style.display = 'none';
+      if (userEmail) userEmail.textContent = '';
     }
   });
 
-  // Клик вне формы закрывает окно
-  window.onclick = function(event) {
-    if (event.target === authModal) authModal.style.display = 'none';
-  }
+  // --- Выход ---
+  if (logoutBtn) logoutBtn.onclick = () => auth.signOut().then(() => location.reload());
 });
 
-auth.onAuthStateChanged(user => {
-  if (user) {
-    loginBtn.style.display = 'none';
-    logoutBtn.style.display = '';
-    userEmail.textContent = user.email;
-  } else {
-    loginBtn.style.display = '';
-    logoutBtn.style.display = 'none';
-    userEmail.textContent = '';
-  }
-});
-logoutBtn.onclick = () => auth.signOut();
-
-// Переключение между формами
-const loginForm = document.getElementById('login-form');
-const registerForm = document.getElementById('register-form');
-document.getElementById('show-register-btn').onclick = () => {
-  loginForm.style.display = "none";
-  registerForm.style.display = "block";
-  document.getElementById('reg-message').textContent = '';
-};
-document.getElementById('show-login-btn').onclick = () => {
-  registerForm.style.display = "none";
-  loginForm.style.display = "block";
-  document.getElementById('auth-message').textContent = '';
-};
-
-// Кнопка регистрации
-document.getElementById('auth-register-btn').onclick = () => {
-  const email = document.getElementById('reg-email').value.trim();
-  const pass = document.getElementById('reg-pass').value;
-  const pass2 = document.getElementById('reg-pass2').value;
-  const regMsg = document.getElementById('reg-message');
-  regMsg.textContent = '';
-
-  if (pass.length < 6) {
-    regMsg.textContent = 'Пароль должен быть не менее 6 символов';
-    return;
-  }
-  if (pass !== pass2) {
-    regMsg.textContent = 'Пароли не совпадают!';
-    return;
-  }
-  auth.createUserWithEmailAndPassword(email, pass)
-    .then(() => location.reload())
-    .catch(e => regMsg.textContent = e.message);
-};
 
 /* --- Бургер-меню --- */
 const menuBtn = document.querySelector('#menu-btn');
