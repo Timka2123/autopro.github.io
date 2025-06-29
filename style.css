@@ -1501,15 +1501,6 @@ section{
   }
 }
 
-.auth-modal {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.60);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1002;
-}
 
 .auth-modal.show { display: flex; }
 
@@ -1560,13 +1551,6 @@ section{
   color: #fff;
   cursor: pointer;
 }
-.auth-message {
-  color: #ff4141;
-  font-size: 13px;
-  text-align: center;
-  margin-top: 8px;
-  min-height: 18px;
-}
 
 #user-controls {
   display: flex;
@@ -1597,33 +1581,6 @@ section{
   max-width: 95vw;
 }
 
-.auth-modal {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.auth-modal-content {
-  background: #222; 
-  border-radius: 18px;
-  padding: 32px 28px;
-  min-width: 300px;
-  box-shadow: 0 4px 32px rgba(0,0,0,0.3);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: 95vw;
-  width: 100%;
-}
-
-.auth-modal-content h2 {
-  color: #fff;
-  margin-bottom: 22px;
-}
 
 .auth-modal-content input {
   margin-bottom: 14px;
@@ -1640,11 +1597,7 @@ section{
   background: #272a2e;
 }
 
-.auth-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
+
 
 .auth-actions button {
   flex: 1 1 45%;
@@ -1670,22 +1623,6 @@ section{
   color: #232323;
 }
 
-.auth-message {
-  min-height: 18px;
-  color: #ff5252;
-  text-align: center;
-  font-size: 14px;
-  margin-bottom: 0;
-}
-
-.close {
-  position: absolute;
-  top: 14px; right: 16px;
-  font-size: 24px;
-  color: #fff;
-  cursor: pointer;
-  font-weight: bold;
-}
 
 .custom-auth-modal {
   display: none;
@@ -1758,23 +1695,6 @@ section{
   margin-top: 0.3em;
 }
 
-.auth-modal {
-  position: fixed;
-  z-index: 10010;
-  left: 0; top: 0; width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.55);
-  display: flex; justify-content: center; align-items: center;
-}
-.auth-modal-content {
-  background: #fff;
-  padding: 2.5rem 2rem;
-  border-radius: 1.2rem;
-  min-width: 330px;
-  width: 95vw;
-  max-width: 360px;
-  box-shadow: var(--box-shadow);
-  position: relative;
-}
 .auth-modal-content .close {
   position: absolute; right: 1.2rem; top: 1rem;
   font-size: 2.2rem; color: var(--black);
@@ -1791,24 +1711,13 @@ section{
   color: #fff;
   font-size: 1rem;
 }
-.auth-actions {
-  display: flex;
-  gap: 16px;
-  width: 100%;
-  justify-content: center;
-}
+
 .auth-actions .btn {
   flex: 1;
 }
 .auth-actions .btn-alt {
   background: #eee;
   color: var(--black);
-}
-.auth-message {
-  min-height: 1.7rem;
-  color: #e74c3c;
-  text-align: center;
-  font-size: 1.35rem;
 }
 
 .auth-modal {
@@ -1845,9 +1754,9 @@ section{
   border: var(--border);
   margin-bottom: 1.2rem;
   font-size: 1.4rem;
-  box-sizing: border-box;
   background: #24262b;
   color: #fff;
+  box-sizing: border-box;
 }
 .auth-actions {
   display: flex;
@@ -1865,7 +1774,7 @@ section{
   border: 1px solid #555;
 }
 .auth-message {
-  min-height: 1.5rem;
+ min-height: 1.5rem;
   margin-top: 0.6rem;
   color: #e74c3c;
   font-size: 1.2rem;
