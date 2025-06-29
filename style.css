@@ -1554,3 +1554,218 @@ section{
   max-width: 95vw;
 }
 
+.auth-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.auth-modal-content {
+  background: #232323;
+  border-radius: 16px;
+  padding: 32px 32px 24px 32px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  min-width: 350px;
+  max-width: 95vw;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: relative;
+}
+
+.auth-modal-content h2 {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.auth-modal-content input {
+  margin-bottom: 14px;
+  padding: 12px 16px;
+  background: #3a3f47;
+  border: none;
+  border-radius: 7px;
+  color: #fff;
+  font-size: 15px;
+}
+
+.auth-modal-content input:focus {
+  outline: 2px solid #ffd600;
+  background: #272a2e;
+}
+
+.auth-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.auth-actions button {
+  flex: 1 1 45%;
+  margin-right: 10px;
+  background: linear-gradient(90deg, #ffd600, #796000);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 0;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.auth-actions button:last-child {
+  margin-right: 0;
+}
+
+.auth-actions button:hover,
+.auth-actions button:focus {
+  background: #ffd600;
+  color: #232323;
+}
+
+.auth-message {
+  min-height: 18px;
+  color: #ff5252;
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 0;
+}
+
+.close {
+  position: absolute;
+  top: 14px; right: 16px;
+  font-size: 24px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.custom-auth-modal {
+  display: none;
+  position: fixed;
+  z-index: 10001;
+  left: 0; top: 0; width: 100vw; height: 100vh;
+  background: rgba(255,255,255,0.85);
+  align-items: center; justify-content: center;
+  transition: opacity 0.3s;
+}
+
+.custom-auth-modal.active { display: flex; }
+
+.custom-auth-form {
+  width: 100%;
+  max-width: 370px;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: var(--box-shadow);
+  padding: 2.5rem 2rem 2rem 2rem;
+  position: relative;
+  text-align: center;
+  margin: auto;
+}
+
+.custom-auth-form h2 {
+  margin-bottom: 1.5rem;
+  color: var(--black);
+  font-size: 2.3rem;
+  font-weight: bold;
+}
+
+.custom-auth-form .box {
+  width: 100%;
+  margin: .7rem 0;
+  padding: 1rem 1.2rem;
+  font-size: 1.6rem;
+  border-radius: .5rem;
+  border: var(--border);
+}
+
+.custom-auth-form .btn {
+  width: 100%;
+  margin-top: 1.2rem;
+}
+
+.toggle-auth {
+  margin-top: 1rem;
+  font-size: 1.4rem;
+}
+
+.toggle-auth a {
+  color: var(--yellow);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.close-btn {
+  position: absolute;
+  top: 1rem; right: 1.3rem;
+  font-size: 2.3rem;
+  color: var(--black);
+  cursor: pointer;
+}
+
+.error-msg {
+  color: #e74c3c;
+  font-size: 1.3rem;
+  min-height: 1.5em;
+  margin-top: 0.3em;
+}
+
+.auth-modal {
+  position: fixed;
+  z-index: 10010;
+  left: 0; top: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.55);
+  display: flex; justify-content: center; align-items: center;
+}
+.auth-modal-content {
+  background: #fff;
+  padding: 2.5rem 2rem;
+  border-radius: 1.2rem;
+  min-width: 330px;
+  width: 95vw;
+  max-width: 360px;
+  box-shadow: var(--box-shadow);
+  position: relative;
+}
+.auth-modal-content .close {
+  position: absolute; right: 1.2rem; top: 1rem;
+  font-size: 2.2rem; color: var(--black);
+  cursor: pointer; z-index: 2;
+}
+.auth-form h2 { margin-bottom: 1.3rem; }
+.auth-form input {
+  width: 100%;
+  padding: 1.1rem 1rem;
+  border: var(--border);
+  border-radius: 7px;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  background: #f8f8f8;
+}
+.auth-actions {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+.auth-actions .btn {
+  flex: 1;
+}
+.auth-actions .btn-alt {
+  background: #eee;
+  color: var(--black);
+}
+.auth-message {
+  min-height: 1.7rem;
+  color: #e74c3c;
+  text-align: center;
+  font-size: 1.35rem;
+}
+
