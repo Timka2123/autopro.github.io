@@ -1500,394 +1500,6 @@ section{
   }
 }
 
-.auth-modal {
-  display: none;
-  position: fixed;
-  z-index: 1100;
-  left: 0; top: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.25);
-  align-items: center;
-  justify-content: center;
-}
-
-.auth-modal.show { 
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  z-index: 10010;
-  position: fixed;
-  left: 0; top: 0; width: 100vw; height: 100vh;
-  background: rgba(18,19,20,0.85);
-}
-
-.auth-form {
-  background: #1a1d1e;
-  border-radius: 14px;
-  padding: 32px 24px 18px 24px;
-  width: 320px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  box-shadow: 0 4px 32px 0 rgba(20,20,20,.14);
-  position: relative;
-  align-items: center;
-}
-
-.auth-form input {
-  width: 100%;
-  margin: 10px 0;
-  padding: 14px 12px;
-  border-radius: 7px;
-  background: #353a44;
-  color: #fff;
-  border: none;
-}
-.auth-form .auth-btns {
-  display: flex;
-  gap: 18px;
-  margin-top: 10px;
-  justify-content: center;
-}
-.auth-title {
-  display: block;
-  text-align: center;
-  margin-bottom: 12px;
-  font-size: 19px;
-  color: #fff;
-  font-weight: 600;
-}
-.close-auth {
-  position: absolute;
-  top: 16px; right: 24px;
-  font-size: 21px;
-  color: #fff;
-  cursor: pointer;
-}
-.auth-message {
-  color: #ff4141;
-  font-size: 13px;
-  text-align: center;
-  margin-top: 8px;
-  min-height: 18px;
-}
-
-#user-controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 10px;
-  min-width: 160px;
-  max-width: 220px;
-  overflow: hidden;
-}
-
-.auth-form {
-  width: 320px;
-  max-width: 95vw;
-}
-
-.auth-modal {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.auth-modal-content {
-  background: #232323;
-  border-radius: 16px;
-  padding: 32px 32px 24px 32px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-  min-width: 350px;
-  max-width: 95vw;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  position: relative;
-}
-
-.auth-modal-content h2 {
-  color: #fff;
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 22px;
-  font-weight: bold;
-}
-
-.auth-modal-content input {
-  margin-bottom: 14px;
-  padding: 12px 16px;
-  background: #3a3f47;
-  border: none;
-  border-radius: 7px;
-  color: #fff;
-  font-size: 15px;
-}
-
-.auth-modal-content input:focus {
-  outline: 2px solid #ffd600;
-  background: #272a2e;
-}
-
-.auth-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.auth-actions button {
-  flex: 1 1 45%;
-  margin-right: 10px;
-  background: linear-gradient(90deg, #ffd600, #796000);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 0;
-  font-size: 17px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-
-.auth-actions button:last-child {
-  margin-right: 0;
-}
-
-.auth-actions button:hover,
-.auth-actions button:focus {
-  background: #ffd600;
-  color: #232323;
-}
-
-.auth-message {
-  min-height: 18px;
-  color: #ff5252;
-  text-align: center;
-  font-size: 14px;
-  margin-bottom: 0;
-}
-
-.close {
-  position: absolute;
-  top: 14px; right: 16px;
-  font-size: 24px;
-  color: #fff;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.custom-auth-modal {
-  display: none;
-  position: fixed;
-  z-index: 10001;
-  left: 0; top: 0; width: 100vw; height: 100vh;
-  background: rgba(255,255,255,0.85);
-  align-items: center; justify-content: center;
-  transition: opacity 0.3s;
-}
-
-.custom-auth-modal.active { display: flex; }
-
-.custom-auth-form {
-  width: 100%;
-  max-width: 370px;
-  background: #fff;
-  border-radius: 1rem;
-  box-shadow: var(--box-shadow);
-  padding: 2.5rem 2rem 2rem 2rem;
-  position: relative;
-  text-align: center;
-  margin: auto;
-}
-
-.custom-auth-form h2 {
-  margin-bottom: 1.5rem;
-  color: var(--black);
-  font-size: 2.3rem;
-  font-weight: bold;
-}
-
-.custom-auth-form .box {
-  width: 100%;
-  margin: .7rem 0;
-  padding: 1rem 1.2rem;
-  font-size: 1.6rem;
-  border-radius: .5rem;
-  border: var(--border);
-}
-
-.custom-auth-form .btn {
-  width: 100%;
-  margin-top: 1.2rem;
-}
-
-.toggle-auth {
-  margin-top: 1rem;
-  font-size: 1.4rem;
-}
-
-.toggle-auth a {
-  color: var(--yellow);
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.close-btn {
-  position: absolute;
-  top: 1rem; right: 1.3rem;
-  font-size: 2.3rem;
-  color: var(--black);
-  cursor: pointer;
-}
-
-.error-msg {
-  color: #e74c3c;
-  font-size: 1.3rem;
-  min-height: 1.5em;
-  margin-top: 0.3em;
-}
-
-.auth-modal {
-  position: fixed;
-  z-index: 10010;
-  left: 0; top: 0; width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.55);
-  display: flex; justify-content: center; align-items: center;
-}
-.auth-modal-content {
-  background: #fff;
-  padding: 2.5rem 2rem;
-  border-radius: 1.2rem;
-  min-width: 330px;
-  width: 95vw;
-  max-width: 360px;
-  box-shadow: var(--box-shadow);
-  position: relative;
-}
-.auth-modal-content .close {
-  position: absolute; right: 1.2rem; top: 1rem;
-  font-size: 2.2rem; color: var(--black);
-  cursor: pointer; z-index: 2;
-}
-.auth-form h2 { margin-bottom: 1.3rem; }
-.auth-form input {
-  width: 100%;
-  padding: 1.1rem 1rem;
-  border: var(--border);
-  border-radius: 7px;
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-  background: #f8f8f8;
-}
-.auth-actions {
-  display: flex;
-  gap: 0.8rem;
-  margin-bottom: 1rem;
-}
-.auth-actions .btn {
-  flex: 1;
-}
-.auth-actions .btn-alt {
-  background: #eee;
-  color: var(--black);
-}
-.auth-message {
-  min-height: 1.7rem;
-  color: #e74c3c;
-  text-align: center;
-  font-size: 1.35rem;
-}
-
-.auth-actions .btn, 
-.auth-modal-content button,
-.auth-modal-content input[type="submit"] {
-  background: linear-gradient(90deg, #f9d806 0%, #f98a06 100%);
-  color: #222;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  padding: 0.9em 0;
-  font-size: 1.25em;
-  width: 100%;
-  margin-top: 1.1em;
-  transition: background 0.2s, color 0.2s;
-  box-shadow: 0 3px 12px #f9d80622;
-}
-
-.auth-actions .btn:hover,
-.auth-modal-content button:hover,
-.auth-modal-content input[type="submit"]:hover {
-  background: linear-gradient(90deg, #ffe259 0%, #f9d806 100%);
-  color: #18191a;
-}
-
-/* Для кнопки регистрации тоже, если вдруг отдельно */
-#auth-register-btn, #auth-login-btn {
-  background: linear-gradient(90deg, #f9d806 0%, #f98a06 100%);
-  color: #222;
-}
-
-.auth-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 1.1rem;
-  width: 100%;
-  align-items: center;
-  margin-top: 1.2em;
-}
-
-.auth-actions .btn {
-  width: 100%;
-  min-width: 0;
-  max-width: none;
-  margin-top: 0;
-}
-
-.auth-modal-content {
-  background: #18191a !important;
-  color: #ffe259 !important;
-  border-radius: 1.3rem;
-  box-shadow: 0 2px 32px #000b, 0 0 16px 0 #232323;
-  padding: 2.2rem 2.4rem 2.4rem 2.4rem;
-  min-width: 330px;
-  width: 98vw;
-  max-width: 370px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.auth-modal {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(18,19,20,0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10010;
-}
-
-.auth-modal-content input[type="email"],
-.auth-modal-content input[type="password"] {
-  width: 100%;
-  padding: 1rem 1.2rem;
-  border-radius: 0.8rem;
-  border: 1px solid #393939;
-  margin-bottom: 1.3rem;
-  font-size: 1.15em;
-  background: #222325;
-  color: #fff;
-  box-sizing: border-box;
-}
-
 :root {
   --yellow: #f9d806;
   --orange: #f98a06;
@@ -1895,155 +1507,45 @@ section{
   --modal-bg-light: #fff;
   --modal-text-dark: #fff;
   --modal-text-light: #18191a;
-  --modal-border-radius: 1.3rem;
+  --modal-border-radius: 1.2rem;
   --btn-yellow-gradient: linear-gradient(90deg, #ffe259 0%, #f9d806 100%);
   --btn-yellow-gradient-hover: linear-gradient(90deg, #f9d806 0%, #f98a06 100%);
   --btn-text-dark: #222;
   --btn-text-light: #18191a;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --modal-bg: var(--modal-bg-dark);
-    --modal-text: var(--modal-text-dark);
-    --btn-text: var(--btn-text-dark);
-  }
-}
-@media (prefers-color-scheme: light) {
-  :root {
-    --modal-bg: var(--modal-bg-light);
-    --modal-text: var(--modal-text-light);
-    --btn-text: var(--btn-text-light);
-  }
-}
-
-/* Модальное окно */
-.auth-modal-content {
-  background: var(--modal-bg, #18191a);
-  color: var(--modal-text, #fff);
-  border-radius: var(--modal-border-radius);
-  box-shadow: 0 2px 32px #000b, 0 0 16px 0 #232323;
-  padding: 2.2rem 2.4rem 2.4rem 2.4rem;
-  min-width: 330px;
-  width: 98vw;
-  max-width: 370px;
-  text-align: center;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* Кнопки "Войти" и "Регистрация" одинаково */
-.auth-modal-content .btn {
-  width: 100%;
-  margin-top: 1.1rem;
-  font-size: 1.15rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 0.7rem;
-  cursor: pointer;
-  padding: 0.95rem 0;
-  background: var(--btn-yellow-gradient);
-  color: var(--btn-text, #222);
-  transition: background 0.18s, color 0.18s, box-shadow 0.13s;
-  box-shadow: 0 3px 9px #f9d8061f;
-  letter-spacing: 0.02em;
-  text-align: center;
-  outline: none;
-  display: block;
-}
-
-.auth-modal-content .btn:hover {
-  background: var(--btn-yellow-gradient-hover);
-  color: var(--btn-text, #fff);
-}
-
-.auth-modal-content .btn:active,
-.auth-modal-content .btn:focus {
-  background: var(--btn-yellow-gradient);
-  color: var(--btn-text, #222);
-  outline: 2px solid var(--yellow);
-}
-
-/* Текст в модалке — заголовок и поля */
-.auth-modal-content h2,
-.auth-modal-content h3 {
-  color: var(--yellow);
-  font-weight: bold;
-  margin-bottom: 1.4rem;
-  text-align: center;
-}
-
-.auth-modal-content input[type="email"],
-.auth-modal-content input[type="password"] {
-  width: 100%;
-  padding: 1rem 1.2rem;
-  border-radius: 0.8rem;
-  border: 1px solid #ccc;
-  margin-bottom: 1.3rem;
-  font-size: 1.15rem;
-  background: #dde0e7;
-  color: #18191a;
-  box-sizing: border-box;
-}
-
-/* Чтобы меню было по центру экрана (если auth-modal – fixed и 100vw/100vh) */
+/* Модальное окно авторизации */
 .auth-modal {
-  display: flex !important;
+  display: none;
+  position: fixed;
+  z-index: 10010;
+  left: 0; top: 0; width: 100vw; height: 100vh;
+  background: rgba(18,19,20,0.85);
   align-items: center;
   justify-content: center;
 }
-
-/* Для небольших экранов */
-@media (max-width: 500px) {
-  .auth-modal-content {
-    padding: 1.2rem;
-    min-width: 0;
-    width: 98vw;
-    max-width: 99vw;
-  }
+.auth-modal.show {
+  display: flex !important;
 }
 
-.auth-modal-content .btn {
-  width: 100%;
-  margin-top: 1.1rem;
-  font-size: 1.15rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 0.7rem;
-  cursor: pointer;
-  padding: 0.95rem 0;
-  background: var(--btn-yellow-gradient);
-  color: var(--btn-text, #222);
-  transition: background 0.18s, color 0.18s, box-shadow 0.13s;
-  box-shadow: 0 3px 9px #f9d8061f;
-  letter-spacing: 0.02em;
-  text-align: center;
-  outline: none;
-  display: block;
-}
-.auth-modal-content .btn + .btn {
-  margin-top: 1.1rem;
-}
-
-:root {
-  --modal-bg-dark: #18191a;
-  --modal-bg-light: #fff;
-  --modal-text-dark: #fff;
-  --modal-text-light: #18191a;
-  --btn-yellow-gradient: linear-gradient(90deg, #ffe259 0%, #f9d806 100%);
-  --btn-yellow-gradient-hover: linear-gradient(90deg, #f9d806 0%, #f98a06 100%);
-  --btn-text-dark: #222;
-  --btn-text-light: #18191a;
-}
-
-/* По умолчанию — светлая тема */
+/* Контент внутри модального окна */
 .auth-modal-content {
   background: var(--modal-bg-light);
   color: var(--modal-text-light);
+  border-radius: var(--modal-border-radius);
+  box-shadow: 0 4px 32px rgba(20,20,20,0.13), 0 0 16px 0 #232323;
+  padding: 2.2rem 2.4rem 2.4rem 2.4rem;
+  min-width: 320px;
+  width: 98vw;
+  max-width: 370px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
 }
-/* Тёмная тема — media query */
+
+/* Адаптация под тёмную тему */
 @media (prefers-color-scheme: dark) {
   .auth-modal-content {
     background: var(--modal-bg-dark);
@@ -2056,3 +1558,97 @@ section{
     border: 1px solid #444;
   }
 }
+
+/* Адаптация под мобильные */
+@media (max-width: 500px) {
+  .auth-modal-content {
+    padding: 1.2rem;
+    min-width: 0;
+    width: 98vw;
+    max-width: 99vw;
+  }
+}
+
+/* Закрывающий крестик */
+.auth-modal-content .close {
+  position: absolute;
+  right: 1.2rem; top: 1rem;
+  font-size: 2.2rem;
+  color: #888;
+  cursor: pointer;
+  z-index: 2;
+}
+
+/* Заголовок */
+.auth-modal-content h2,
+.auth-modal-content h3 {
+  color: var(--yellow);
+  font-weight: bold;
+  margin-bottom: 1.4rem;
+  text-align: center;
+}
+
+/* Поля ввода */
+.auth-modal-content input[type="email"],
+.auth-modal-content input[type="password"] {
+  width: 100%;
+  padding: 1rem 1.2rem;
+  border-radius: 0.8rem;
+  border: 1px solid #ccc;
+  margin-bottom: 1.3rem;
+  font-size: 1.1rem;
+  background: #dde0e7;
+  color: #18191a;
+  box-sizing: border-box;
+  transition: border .16s, background .18s, color .18s;
+}
+.auth-modal-content input[type="email"]:focus,
+.auth-modal-content input[type="password"]:focus {
+  border: 1.5px solid var(--yellow);
+  outline: none;
+}
+
+/* Кнопки "Войти" и "Регистрация" */
+.auth-modal-content .btn {
+  width: 100%;
+  margin-top: 1.1rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.7rem;
+  cursor: pointer;
+  padding: 0.95rem 0;
+  background: var(--btn-yellow-gradient);
+  color: var(--btn-text-light);
+  transition: background 0.18s, color 0.18s, box-shadow 0.13s;
+  box-shadow: 0 3px 9px #f9d8061f;
+  letter-spacing: 0.02em;
+  text-align: center;
+  outline: none;
+  display: block;
+}
+.auth-modal-content .btn + .btn {
+  margin-top: 1.1rem;
+}
+.auth-modal-content .btn:hover {
+  background: var(--btn-yellow-gradient-hover);
+  color: var(--modal-bg-dark);
+}
+.auth-modal-content .btn:active,
+.auth-modal-content .btn:focus {
+  background: var(--btn-yellow-gradient);
+  color: var(--btn-text-dark);
+  outline: 2px solid var(--yellow);
+}
+
+/* Сообщение об ошибке/инфо */
+.auth-modal-content .auth-message {
+  min-height: 1.7rem;
+  color: #e74c3c;
+  text-align: center;
+  font-size: 1.1rem;
+  margin-bottom: 0;
+  margin-top: 0.5rem;
+}
+
+
