@@ -71,6 +71,13 @@ section{
   color: #fff;
 }
 
+.btn:active, .btn:focus {
+  background: linear-gradient(90deg, #f9d806 0%, #f98a06 100%) !important;
+  color: #fff !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 .header{
     display: flex;
     align-items: center;
