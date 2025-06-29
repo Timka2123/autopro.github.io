@@ -13,74 +13,80 @@ document.addEventListener('DOMContentLoaded', function() {
   const auth = firebase.auth();
 
   // --- DOM-элементы ---
- const authModal = document.getElementById('auth-modal');
- const loginBtn = document.getElementById('login-btn');
- const closeAuth = document.getElementById('close-auth');
- const loginForm = document.getElementById('login-form');
- const registerForm = document.getElementById('register-form');
- const showRegisterBtn = document.getElementById('show-register-btn');
- const showLoginBtn = document.getElementById('show-login-btn');
- const regMessage = document.getElementById('reg-message');
- const authMessage = document.getElementById('auth-message');
+  const authModal = document.getElementById('auth-modal');
+  const loginBtn = document.getElementById('login-btn');
+  const logoutBtn = document.getElementById('logout-btn');
+  const closeAuth = document.getElementById('close-auth');
+  const loginForm = document.getElementById('login-form');
+  const registerForm = document.getElementById('register-form');
+  const showRegisterBtn = document.getElementById('show-register-btn');
+  const showLoginBtn = document.getElementById('show-login-btn');
+  const regMessage = document.getElementById('reg-message');
+  const authMessage = document.getElementById('auth-message');
+  const userEmail = document.getElementById('user-email'); // если выводишь почту
 
+  // --- Открытие и закрытие модального окна ---
   loginBtn.onclick = () => {
-  authModal.classList.add('show');
-  loginForm.style.display = "block";
-  registerForm.style.display = "none";
-  authMessage.textContent = "";
-  regMessage.textContent = "";
-};
-closeAuth.onclick = () => {
-  authModal.classList.remove('show');
-  authMessage.textContent = "";
-  regMessage.textContent = "";
-};
-showRegisterBtn.onclick = () => {
-  loginForm.style.display = "none";
-  registerForm.style.display = "block";
-  authMessage.textContent = "";
-  regMessage.textContent = "";
-};
-showLoginBtn.onclick = () => {
-  loginForm.style.display = "block";
-  registerForm.style.display = "none";
-  authMessage.textContent = "";
-  regMessage.textContent = "";
-};
+    authModal.style.display = "block";
+    loginForm.style.display = "block";
+    registerForm.style.display = "none";
+    authMessage.textContent = "";
+    regMessage.textContent = "";
+  };
+  closeAuth.onclick = () => {
+    authModal.style.display = "none";
+    authMessage.textContent = "";
+    regMessage.textContent = "";
+  };
+
+  // --- Переключение форм ---
+  showRegisterBtn.onclick = () => {
+    loginForm.style.display = "none";
+    registerForm.style.display = "block";
+    authMessage.textContent = "";
+    regMessage.textContent = "";
+  };
+  
+  showLoginBtn.onclick = () => {
+    loginForm.style.display = "block";
+    registerForm.style.display = "none";
+    authMessage.textContent = "";
+    regMessage.textContent = "";
+  };
 
   // --- Вход ---
   document.getElementById('auth-login-btn').onclick = () => {
-  const email = document.getElementById('auth-email').value.trim();
-  const pass = document.getElementById('auth-pass').value;
-  auth.signInWithEmailAndPassword(email, pass)
-    .then(() => {
-      authModal.classList.remove('show'); // <-- вот тут!
-      location.reload();
-    })
-    .catch(e => authMessage.textContent = e.message);
-};
+    const email = document.getElementById('auth-email').value.trim();
+    const pass = document.getElementById('auth-pass').value;
+    auth.signInWithEmailAndPassword(email, pass)
+      .then(() => {
+        authModal.style.display = "none";
+        location.reload();
+      })
+      .catch(e => authMessage.textContent = e.message);
+  };
 
   // --- Регистрация с проверкой пароля ---
   document.getElementById('auth-register-btn').onclick = () => {
-  const email = document.getElementById('reg-email').value.trim();
-  const pass1 = document.getElementById('reg-pass').value;
-  const pass2 = document.getElementById('reg-pass2').value;
-  regMessage.textContent = '';
-  if (pass1.length < 6) {
-    regMessage.textContent = "Пароль должен быть не менее 6 символов";
-    return;
-  }
-  if (pass1 !== pass2) {
-    regMessage.textContent = "Пароли не совпадают!";
-    return;
-  }
-  auth.createUserWithEmailAndPassword(email, pass1)
-    .then(() => {
-      authModal.classList.remove('show'); // <-- и вот тут!
-      location.reload();
-    })
-    .catch(e => regMessage.textContent = e.message);
-};
+    const email = document.getElementById('reg-email').value.trim();
+    const pass1 = document.getElementById('reg-pass').value;
+    const pass2 = document.getElementById('reg-pass2').value;
+    regMessage.textContent = '';
+    if (pass1.length < 6) {
+      regMessage.textContent = "Пароль должен быть не менее 6 символов";
+      return;
+    }
+    if (pass1 !== pass2) {
+      regMessage.textContent = "Пароли не совпадают!";
+      return;
+    }
+    auth.createUserWithEmailAndPassword(email, pass1)
+      .then(() => {
+        authModal.style.display = "none";
+        location.reload();
+      })
+      .catch(e => regMessage.textContent = e.message);
+  };
 
   // --- Смена отображения кнопок и email ---
   auth.onAuthStateChanged(user => {
