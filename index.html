@@ -41,18 +41,20 @@
 </header>
 
     
-<!-- Модальное окно авторизации -->
-    <div id="auth-modal" class="auth-modal" style="display:none;">
-        <div class="auth-content">
-            <span id="close-auth" style="float:right; cursor:pointer;">&times;</span>
-                <h2>Вход / Регистрация</h2>
-                <input type="email" id="auth-email" placeholder="E-mail" /><br>
-                <input type="password" id="auth-pass" placeholder="Пароль" /><br>
-                <button id="auth-login-btn" class="btn">Войти</button>
-                <button id="auth-register-btn" class="btn">Регистрация</button>
-            <div id="auth-message" style="color:#f00;margin:10px 0;"></div>
+        <!-- Окно авторизации -->
+        <div id="auth-modal" class="auth-modal">
+        <form class="auth-form" onsubmit="return false;">
+            <span class="auth-title">Вход / Регистрация</span>
+            <input type="email" id="auth-email" placeholder="Email" required>
+            <input type="password" id="auth-pass" placeholder="Пароль" required>
+            <div class="auth-btns">
+            <button type="button" id="auth-login-btn" class="btn yellow">Войти</button>
+            <button type="button" id="auth-register-btn" class="btn">Регистрация</button>
+            </div>
+            <div id="auth-message" class="auth-message"></div>
+            <span id="close-auth" class="close-auth">&times;</span>
+        </form>
         </div>
-    </div>
 
 <section class="home" id="home">
 
