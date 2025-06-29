@@ -17,11 +17,8 @@
 <body>
     
 <header class="header">
-
     <div id="menu-btn" class="fas fa-bars"></div>
-
-    <a href="#" class="logo"> <span>Авто</span>Партс </a>
-
+    <a href="#" class="logo"><span>Авто</span>Партс</a>
     <nav class="navbar">
         <a href="#home">Домашняя</a>
         <a href="#vehicles">Автомобили</a>
@@ -30,31 +27,42 @@
         <a href="#reviews">Отзывы</a>
         <a href="#contact">Контакт</a>
     </nav>
-
-    <div id="user-controls" style="display: flex; align-items: center; gap: 10px;">
+    <div id="user-controls" style="display: flex; align-items: center; gap: 10px; min-width: 210px;">
         <button id="login-btn" class="btn">Войти</button>
         <button id="logout-btn" class="btn" style="display:none;">Выйти</button>
         <span id="user-email" style="color: #333;"></span>
         <i class="far fa-user"></i>
     </div>
-
 </header>
 
+
     
-        <!-- Окно авторизации -->
-        <div id="auth-modal" class="auth-modal">
-        <form class="auth-form" onsubmit="return false;">
-            <span class="auth-title">Вход / Регистрация</span>
-            <input type="email" id="auth-email" placeholder="Email" required>
-            <input type="password" id="auth-pass" placeholder="Пароль" required>
-            <div class="auth-btns">
-            <button type="button" id="auth-login-btn" class="btn yellow">Войти</button>
-            <button type="button" id="auth-register-btn" class="btn">Регистрация</button>
-            </div>
-            <div id="auth-message" class="auth-message"></div>
-            <span id="close-auth" class="close-auth">&times;</span>
-        </form>
+    <!-- В модалке -->
+    <div id="auth-modal" class="auth-modal">
+    <form class="auth-form" id="login-form" onsubmit="return false;">
+        <span class="auth-title">Вход</span>
+        <input type="email" id="auth-email" placeholder="Email" required>
+        <input type="password" id="auth-pass" placeholder="Пароль" required>
+        <div class="auth-btns">
+        <button type="button" id="auth-login-btn" class="btn yellow">Войти</button>
+        <button type="button" id="show-register-btn" class="btn">Регистрация</button>
         </div>
+        <div id="auth-message" class="auth-message"></div>
+    </form>
+
+    <form class="auth-form" id="register-form" style="display: none;" onsubmit="return false;">
+        <span class="auth-title">Регистрация</span>
+        <input type="email" id="reg-email" placeholder="Email" required>
+        <input type="password" id="reg-pass" placeholder="Пароль" required>
+        <input type="password" id="reg-pass2" placeholder="Повторите пароль" required>
+        <div class="auth-btns">
+        <button type="button" id="auth-register-btn" class="btn yellow">Зарегистрироваться</button>
+        <button type="button" id="show-login-btn" class="btn">Войти</button>
+        </div>
+        <div id="reg-message" class="auth-message"></div>
+    </form>
+    <span id="close-auth" class="close-auth">&times;</span>
+    </div>
 
 <section class="home" id="home">
 
