@@ -1511,7 +1511,15 @@ section{
   justify-content: center;
 }
 
-.auth-modal.show { display: flex; }
+.auth-modal.show { 
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  z-index: 10010;
+  position: fixed;
+  left: 0; top: 0; width: 100vw; height: 100vh;
+  background: rgba(18,19,20,0.85);
+}
 
 .auth-form {
   background: #1a1d1e;
@@ -1994,5 +2002,57 @@ section{
     min-width: 0;
     width: 98vw;
     max-width: 99vw;
+  }
+}
+
+.auth-modal-content .btn {
+  width: 100%;
+  margin-top: 1.1rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.7rem;
+  cursor: pointer;
+  padding: 0.95rem 0;
+  background: var(--btn-yellow-gradient);
+  color: var(--btn-text, #222);
+  transition: background 0.18s, color 0.18s, box-shadow 0.13s;
+  box-shadow: 0 3px 9px #f9d8061f;
+  letter-spacing: 0.02em;
+  text-align: center;
+  outline: none;
+  display: block;
+}
+.auth-modal-content .btn + .btn {
+  margin-top: 1.1rem;
+}
+
+:root {
+  --modal-bg-dark: #18191a;
+  --modal-bg-light: #fff;
+  --modal-text-dark: #fff;
+  --modal-text-light: #18191a;
+  --btn-yellow-gradient: linear-gradient(90deg, #ffe259 0%, #f9d806 100%);
+  --btn-yellow-gradient-hover: linear-gradient(90deg, #f9d806 0%, #f98a06 100%);
+  --btn-text-dark: #222;
+  --btn-text-light: #18191a;
+}
+
+/* По умолчанию — светлая тема */
+.auth-modal-content {
+  background: var(--modal-bg-light);
+  color: var(--modal-text-light);
+}
+/* Тёмная тема — media query */
+@media (prefers-color-scheme: dark) {
+  .auth-modal-content {
+    background: var(--modal-bg-dark);
+    color: var(--modal-text-dark);
+  }
+  .auth-modal-content input[type="email"],
+  .auth-modal-content input[type="password"] {
+    background: #232323;
+    color: #fff;
+    border: 1px solid #444;
   }
 }
