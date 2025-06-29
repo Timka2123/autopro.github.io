@@ -178,6 +178,7 @@ section{
     color:var(--light-color);
     cursor: pointer;
     flex: 0 0 auto;
+    display: none;
 }
 
 #user-controls {
@@ -1544,6 +1545,9 @@ section{
     margin-top: 7rem; /* если на малых экранах шапка ниже */
     padding: 2rem;
   }
+  #menu-btn {
+    display: block;
+  }
 }
 
 :root {
@@ -1565,7 +1569,9 @@ section{
 /* Модальное окно авторизации */
 .auth-modal {
   position: fixed;
-  top: 0; left: 0; width: 100vw; height: 100vh;
+  top: 0; left: 0; 
+  width: 100vw; 
+  height: 100vh;
   background: rgba(18,19,20,0.85);
   display: flex;
   align-items: center;
