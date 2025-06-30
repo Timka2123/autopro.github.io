@@ -427,8 +427,16 @@ home?.addEventListener('mouseleave', () => {
   parallaxs.forEach(el => (el.style.transform = 'translateX(0) translateY(0)'));
 });
 
-// --- Swiper ---
-const baseOpts = { /* твои опции */ };
+/* --- Swiper-слайдеры --- */
+const baseOpts = {
+  grabCursor: true,
+  centeredSlides: true,
+  spaceBetween: 20,
+  loop: true,
+  autoplay: { delay: 9500, disableOnInteraction: false },
+  pagination: { el: '.swiper-pagination', clickable: true },
+  breakpoints: { 0: { slidesPerView: 1 }, 768: { slidesPerView: 2 }, 1024:{ slidesPerView: 3 } }
+};
 try {
   if (typeof Swiper !== 'undefined') {
     new Swiper('.vehicles-slider', baseOpts);
@@ -436,3 +444,4 @@ try {
     new Swiper('.review-slider',   baseOpts);
   }
 } catch(e) {}
+
