@@ -445,3 +445,54 @@ try {
   }
 } catch(e) {}
 
+// Получить содержимое корзины
+function getCartData() {
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  return cart.map(id => partsData.find(p => p.id == id));
+}
+
+// Отправка на Email
+function sendOrderEmail(cartItems, userEmail) {
+  const orderList = cartItems.map(p =>
+    `<li>${p.name} (${p.id}) — ${p.price} ₽</li>`
+  ).join('');
+  const templateParams = {
+    user_email: userEmail,
+    order_html: `<ul>${orderList}</ul>`,
+    order_total: cartItems.reduce((s, p) => s + p.price, 0)
+  };
+  return emailjs.send('service_xxkj39b', 'template_syesdjf', templateParams);
+}
+
+// Отправка в Telegram
+function sendOrderTelegram(cartItems, userEmail) {
+  const TOKEN = '8153668086:AAHgyGjLfbkA2xQk4_Oyk6cwwbltXqXsLUg';
+  const CHAT_ID = '2114460264';
+  let msg = `Новый заказ!\nEmail: ${userEmail}\nТовары:\n`;
+  msg += cartItems.map(p => `${p.name} — ${p.price} ₽`).join('\n');
+  msg += `\nВсего: ${cartItems.reduce((s, p) => s + p.price, 0)} ₽`;
+  const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+  return fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
+  });
+}
+
+// Кнопка оформления заказа
+document.getElementById('order-btn').onclick = async function() {
+  const user = firebase.auth().currentUser;
+  if (!user) return alert('Необходимо войти!');
+  const cartItems = getCartData();
+  if (!cartItems.length) return alert('Корзина пуста');
+  try {
+    await sendOrderEmail(cartItems, user.email);
+    await sendOrderTelegram(cartItems, user.email);
+    alert('Ваш заказ принят!');
+    localStorage.removeItem('cart');
+    updateCartCounter();
+    // Перерисуй корзину/интерфейс если надо
+  } catch(e) {
+    alert('Ошибка при отправке заказа.');
+  }
+};
