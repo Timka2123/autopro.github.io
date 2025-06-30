@@ -39,6 +39,34 @@
   </div>
 </header>
 
+<div id="auth-modal" class="auth-modal">
+  <div class="auth-modal-content">
+    <span class="close" id="close-auth">&times;</span>
+    <!-- Вход -->
+    <form id="login-form" class="auth-form" autocomplete="on">
+      <h2>Вход</h2>
+      <input type="email" id="auth-email" placeholder="Email" required>
+      <input type="password" id="auth-pass" placeholder="Пароль" required>
+      <div class="auth-actions">
+        <button type="button" id="auth-login-btn" class="btn">Войти</button>
+        <button type="button" id="show-register-btn" class="btn btn-alt">Регистрация</button>
+      </div>
+      <div class="auth-message" id="auth-message"></div>
+    </form>
+    <!-- Регистрация -->
+    <form id="register-form" class="auth-form" style="display:none;" autocomplete="on">
+      <h2>Регистрация</h2>
+      <input type="email" id="reg-email" placeholder="Email" required>
+      <input type="password" id="reg-pass" placeholder="Пароль" required>
+      <input type="password" id="reg-pass2" placeholder="Повторите пароль" required>
+      <div class="auth-actions">
+        <button type="button" id="auth-register-btn" class="btn yellow">Зарегистрироваться</button>
+        <button type="button" id="show-login-btn" class="btn btn-alt">Войти</button>
+      </div>
+      <div id="reg-message" class="auth-message"></div>
+    </form>
+  </div>
+</div>
 
 <div class="filters-bar">
   <div class="filter-group">
