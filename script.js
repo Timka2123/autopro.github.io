@@ -336,23 +336,22 @@ function renderParts(arr) {
       setAnalysisAutoClose(container, btn);
     }
   }));
+
+  // --- КНОПКИ "Купить" ---
   document.querySelectorAll('.buy-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
-    const partId = btn.dataset.id;
-    // Проверка: авторизован ли пользователь?
-    if (!isUserLoggedIn()) {
-      // Показывай модальное окно авторизации
-      authModal.style.display = "flex";
-      return;
-    }
-    // Добавь логику добавления в корзину
-    addToCart(partId);
-    // Покажи сообщение или анимацию
-    btn.textContent = "В корзине!";
-    setTimeout(() => btn.textContent = "Купить", 2000);
+    btn.addEventListener('click', function() {
+      const partId = btn.dataset.id;
+      if (!isUserLoggedIn()) {
+        authModal.style.display = "flex";
+        return;
+      }
+      addToCart(partId); // addToCart сам вызывает updateCartCounter!
+      btn.textContent = "В корзине!";
+      setTimeout(() => btn.textContent = "Купить", 2000);
+    });
   });
-  updateCartCounter();
-});
+
+ updateCartCounter(); 
 
 function isUserLoggedIn() {
   return firebase.auth().currentUser != null;
