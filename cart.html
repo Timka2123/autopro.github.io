@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Корзина | Autopro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Стили (замени на свои пути, если нужно) -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body { background: #212324; color: #fff; font-family: Arial, sans-serif; }
+    .container { max-width: 600px; margin: 50px auto; background: #26282a; border-radius: 18px; box-shadow: 0 8px 40px #0006; padding: 2em 2.5em; }
+    h1 { font-size: 2.2em; margin-bottom: .7em; text-align: center; }
+    .cart-list { margin-bottom: 2em; }
+    .cart-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3336; padding: .8em 0; gap: 10px;}
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item span { font-size: 1.1em; }
+    .cart-remove { color: #f44336; background: none; border: none; cursor: pointer; font-size: 1.2em; margin-left: 10px; }
+    #cart-total { font-size: 1.25em; text-align: right; margin-bottom: 1.2em; }
+    .empty-cart { text-align: center; color: #bbb; margin: 2em 0; font-size: 1.2em; }
+    #order-btn { width: 100%; background: linear-gradient(90deg,#ffc107,#f44336); color: #232323; font-weight: bold; border: none; border-radius: 10px; font-size: 1.25em; padding: 0.9em; cursor: pointer; transition: .2s; box-shadow: 0 3px 10px #f4433644;}
+    #order-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    @media (max-width: 600px) {
+      .container { padding: 1em .5em; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="fas fa-shopping-cart"></i> Корзина</h1>
+    <div class="cart-list" id="cart-items-list"></div>
+    <div id="cart-total"></div>
+    <button id="order-btn">Оформить заказ</button>
+    <div id="order-status" style="margin-top:1.2em; text-align:center;"></div>
+  </div>
+
+  <!-- Firebase, EmailJS и твои скрипты -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script>
+    // Инициализация EmailJS (service_xxx)
+    emailjs.init('service_xxkj39b');
+  </script>
+  <script src="your-app-main.js"></script>
+  <script>
+    // partsData должен быть загружен из export_fixed.json до загрузки этой страницы!
+    let partsData = [];
+    fetch('export_fixed.json').then(r => r.json()).then(d => { partsData = d; renderCartItems(); });
+
+    // Получить содержимое корзины
+    function getCartData() {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      return cart.map(id => partsData.find(p => p.id == id)).filter(Boolean);
+    }
+
+    function removeFromCart(id) {
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      cart = cart.filter(cid => cid != id);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      renderCartItems();
+      updateCartCounter?.();
+    }
+
+    function renderCartItems() {
+      const cartItems = getCartData();
+      const list = document.getElementById('cart-items-list');
+      const total = document.getElementById('cart-total');
+      const orderBtn = document.getElementById('order-btn');
+      if (!cartItems.length) {
+        list.innerHTML = '<div class="empty-cart">Корзина пуста <br><a href="index.html" style="color:#f9d806;text-decoration:underline;">← Вернуться к покупкам</a></div>';
+        total.innerHTML = '';
+        orderBtn.disabled = true;
+        return;
+      }
+      list.innerHTML = cartItems.map(p => `
+        <div class="cart-item">
+          <span>${p.name} <span style="color:#999;font-size:.9em;">(арт. ${p.id})</span></span>
+          <span><b>${p.price}</b> ₽ 
+            <button class="cart-remove" title="Удалить" onclick="removeFromCart('${p.id}')"><i class="fas fa-trash"></i></button>
+          </span>
+        </div>
+      `).join('');
+      total.innerHTML = `<b>Итого: ${cartItems.reduce((s, p) => s + p.price, 0)} ₽</b>`;
+      orderBtn.disabled = false;
+    }
+
+    // Для обновления иконки корзины в header (если нужен)
+    function updateCartCounter() {
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      let el = document.getElementById('cart-counter');
+      if (el) el.textContent = cart.length;
+    }
+
+    // Оформление заказа
+    document.getElementById('order-btn').onclick = async function() {
+      const user = firebase.auth().currentUser;
+      if (!user) { alert('Необходимо войти для оформления заказа!'); return; }
+      const cartItems = getCartData();
+      if (!cartItems.length) return alert('Корзина пуста');
+      document.getElementById('order-status').innerHTML = "Отправка заказа...";
+      try {
+        await sendOrderEmail(cartItems, user.email);
+        await sendOrderTelegram(cartItems, user.email);
+        document.getElementById('order-status').innerHTML = "Ваш заказ принят! Спасибо 😊";
+        localStorage.removeItem('cart');
+        renderCartItems();
+        updateCartCounter();
+      } catch(e) {
+        document.getElementById('order-status').innerHTML = "Ошибка при отправке заказа!";
+      }
+    };
+
+    // --- EmailJS ---
+    function sendOrderEmail(cartItems, userEmail) {
+      const orderList = cartItems.map(p => `<li>${p.name} (${p.id}) — ${p.price} ₽</li>`).join('');
+      const templateParams = {
+        user_email: userEmail,
+        order_html: `<ul>${orderList}</ul>`,
+        order_total: cartItems.reduce((s, p) => s + p.price, 0)
+      };
+      return emailjs.send('service_xxkj39b', 'template_syesdjf', templateParams);
+    }
+    // --- Telegram ---
+    function sendOrderTelegram(cartItems, userEmail) {
+      const TOKEN = '8153668086:AAHgyGjLfbkA2xQk4_Oyk6cwwbltXqXsLUg';
+      const CHAT_ID = '2114460264';
+      let msg = `Новый заказ!\nEmail: ${userEmail}\nТовары:\n`;
+      msg += cartItems.map(p => `${p.name} — ${p.price} ₽`).join('\n');
+      msg += `\nВсего: ${cartItems.reduce((s, p) => s + p.price, 0)} ₽`;
+      const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+      return fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
+      });
+    }
+  </script>
+</body>
+</html>
