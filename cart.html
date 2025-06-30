@@ -1,121 +1,170 @@
-<!-- ... head и стили остаются без изменений ... -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script>
-  // Firebase config и инициализация
-  const firebaseConfig = {
-    apiKey: "AIzaSyAjVd0NGBE3_r4Ot9phZ-SzIhWMyEYNfrw",
-    authDomain: "autopro-e3161.firebaseapp.com",
-    projectId: "autopro-e3161",
-    storageBucket: "autopro-e3161.appspot.com",
-    messagingSenderId: "274244574652",
-    appId: "1:274244574652:web:012f0b403667f98b5c1fb9",
-    measurementId: "G-G0FH4XQTCC"
-  };
-  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-
-  // Инициализация EmailJS Public Key (а не service!)
-  emailjs.init('Q78mxFzz_Dx_tyVpO');
-
-  // Загрузка каталога
-  let partsData = [];
-  fetch('export_fixed.json').then(r => r.json()).then(d => { partsData = d; renderCartItems(); });
-
-  function getCartData() {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    return cart.map(id => partsData.find(p => p.id == id)).filter(Boolean);
-  }
-  function removeFromCart(id) {
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    cart = cart.filter(cid => cid != id);
-    localStorage.setItem('cart', JSON.stringify(cart));
-    renderCartItems();
-    updateCartCounter?.();
-  }
-  function renderCartItems() {
-    const cartItems = getCartData();
-    const list = document.getElementById('cart-items-list');
-    const total = document.getElementById('cart-total');
-    const orderBtn = document.getElementById('order-btn');
-    if (!cartItems.length) {
-      list.innerHTML = '<div class="empty-cart">Корзина пуста <br><a href="index.html" style="color:#f9d806;text-decoration:underline;">← Вернуться к покупкам</a></div>';
-      total.innerHTML = '';
-      orderBtn.disabled = true;
-      return;
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Корзина | Autopro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Основные стили -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body { background: #212324; color: #fff; font-family: Arial, sans-serif; }
+    .container { max-width: 600px; margin: 50px auto; background: #26282a; border-radius: 18px; box-shadow: 0 8px 40px #0006; padding: 2em 2.5em; }
+    h1 { font-size: 2.2em; margin-bottom: .7em; text-align: center; }
+    .cart-list { margin-bottom: 2em; }
+    .cart-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3336; padding: .8em 0; gap: 10px;}
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item span { font-size: 1.1em; }
+    .cart-remove { color: #f44336; background: none; border: none; cursor: pointer; font-size: 1.2em; margin-left: 10px; }
+    #cart-total { font-size: 1.25em; text-align: right; margin-bottom: 1.2em; }
+    .empty-cart { text-align: center; color: #bbb; margin: 2em 0; font-size: 1.2em; }
+    #order-btn { width: 100%; background: linear-gradient(90deg,#ffc107,#f44336); color: #232323; font-weight: bold; border: none; border-radius: 10px; font-size: 1.25em; padding: 0.9em; cursor: pointer; transition: .2s; box-shadow: 0 3px 10px #f4433644;}
+    #order-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    @media (max-width: 600px) {
+      .container { padding: 1em .5em; }
     }
-    list.innerHTML = cartItems.map(p => `
-      <div class="cart-item">
-        <span>${p.name} <span style="color:#999;font-size:.9em;">(арт. ${p.id})</span></span>
-        <span><b>${p.price}</b> ₽ 
-          <button class="cart-remove" title="Удалить" onclick="removeFromCart('${p.id}')"><i class="fas fa-trash"></i></button>
-        </span>
-      </div>
-    `).join('');
-    total.innerHTML = `<b>Итого: ${cartItems.reduce((s, p) => s + p.price, 0)} ₽</b>`;
-    orderBtn.disabled = false;
-  }
-  function updateCartCounter() {
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    let el = document.getElementById('cart-counter');
-    if (el) el.textContent = cart.length;
-  }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="fas fa-shopping-cart"></i> Корзина</h1>
+    <div class="cart-list" id="cart-items-list"></div>
+    <div id="cart-total"></div>
+    <button id="order-btn">Оформить заказ</button>
+    <div id="order-status" style="margin-top:1.2em; text-align:center;"></div>
+  </div>
 
-  // --- Формируем параметры для шаблона EmailJS ---
-  function buildEmailParams(cartItems, userEmail) {
-    const orderId = Date.now(); // можно заменить на более осмысленный id
-    const orders = cartItems.map(p => ({
-      image_url: p.img || '',
-      name: p.name,
-      units: 1, // если будет количество — вставь реальное
-      price: p.price
-    }));
-    const total = cartItems.reduce((sum, p) => sum + p.price, 0);
-    return {
-      order_id: orderId,
-      email: userEmail,
-      orders: orders,
-      cost: {
-        shipping: 0,
-        tax: 0,
-        total: total
+  <!-- Скрипты: Firebase, EmailJS -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    // --- Firebase config ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAjVd0NGBE3_r4Ot9phZ-SzIhWMyEYNfrw",
+      authDomain: "autopro-e3161.firebaseapp.com",
+      projectId: "autopro-e3161",
+      storageBucket: "autopro-e3161.appspot.com",
+      messagingSenderId: "274244574652",
+      appId: "1:274244574652:web:012f0b403667f98b5c1fb9",
+      measurementId: "G-G0FH4XQTCC"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // --- EmailJS init ---
+    emailjs.init('Q78mxFzz_Dx_tyVpO'); // Public key (НЕ service!)
+
+    // --- Загрузка каталога ---
+    let partsData = [];
+    fetch('export_fixed.json').then(r => r.json()).then(d => { partsData = d; renderCartItems(); });
+
+    // --- Получить содержимое корзины ---
+    function getCartData() {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      // Преобразуем массив в {id, qty} если нужно будет поддержка количества
+      // Пока qty=1
+      return cart.map(id => partsData.find(p => p.id == id)).filter(Boolean);
+    }
+
+    function removeFromCart(id) {
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      cart = cart.filter(cid => cid != id);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      renderCartItems();
+      updateCartCounter?.();
+    }
+
+    function renderCartItems() {
+      const cartItems = getCartData();
+      const list = document.getElementById('cart-items-list');
+      const total = document.getElementById('cart-total');
+      const orderBtn = document.getElementById('order-btn');
+      if (!cartItems.length) {
+        list.innerHTML = '<div class="empty-cart">Корзина пуста <br><a href="index.html" style="color:#f9d806;text-decoration:underline;">← Вернуться к покупкам</a></div>';
+        total.innerHTML = '';
+        orderBtn.disabled = true;
+        return;
+      }
+      list.innerHTML = cartItems.map(p => `
+        <div class="cart-item">
+          <span>${p.name} <span style="color:#999;font-size:.9em;">(арт. ${p.id})</span></span>
+          <span><b>${p.price}</b> ₽ 
+            <button class="cart-remove" title="Удалить" onclick="removeFromCart('${p.id}')"><i class="fas fa-trash"></i></button>
+          </span>
+        </div>
+      `).join('');
+      total.innerHTML = `<b>Итого: ${cartItems.reduce((s, p) => s + p.price, 0)} ₽</b>`;
+      orderBtn.disabled = false;
+    }
+
+    // --- Для иконки корзины в header (если есть) ---
+    function updateCartCounter() {
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      let el = document.getElementById('cart-counter');
+      if (el) el.textContent = cart.length;
+    }
+
+    // --- Формируем параметры для шаблона EmailJS ---
+    function buildEmailParams(cartItems, userEmail) {
+      const orderId = Date.now(); // Можно сделать красивее
+      const orders = cartItems.map(p => ({
+        image_url: p.img || '',
+        name: p.name,
+        units: 1, // Если сделаешь поддержку количества — сюда подставить реальное qty
+        price: p.price
+      }));
+      const total = cartItems.reduce((sum, p) => sum + p.price, 0);
+      return {
+        order_id: orderId,
+        email: userEmail,
+        orders: orders,
+        cost: {
+          shipping: 0,
+          tax: 0,
+          total: total
+        }
+      };
+    }
+
+    function sendOrderEmail(cartItems, userEmail) {
+      const params = buildEmailParams(cartItems, userEmail);
+      // ID сервиса и шаблона смотри в EmailJS (service_xxkj39b и template_qxz0943)
+      return emailjs.send('service_xxkj39b', 'template_qxz0943', params);
+    }
+
+    function sendOrderTelegram(cartItems, userEmail) {
+      const TOKEN = '8153668086:AAHgyGjLfbkA2xQk4_Oyk6cwwbltXqXsLUg';
+      const CHAT_ID = '2114460264';
+      let msg = `Новый заказ!\nEmail: ${userEmail}\nТовары:\n`;
+      msg += cartItems.map(p => `${p.name} — ${p.price} ₽`).join('\n');
+      msg += `\nВсего: ${cartItems.reduce((s, p) => s + p.price, 0)} ₽`;
+      const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+      return fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
+      });
+    }
+
+    // --- Оформление заказа ---
+    document.getElementById('order-btn').onclick = async function() {
+      const user = firebase.auth().currentUser;
+      if (!user) { alert('Необходимо войти для оформления заказа!'); return; }
+      const cartItems = getCartData();
+      if (!cartItems.length) return alert('Корзина пуста');
+      document.getElementById('order-status').innerHTML = "Отправка заказа...";
+      try {
+        await sendOrderEmail(cartItems, user.email);
+        await sendOrderTelegram(cartItems, user.email);
+        document.getElementById('order-status').innerHTML = "Ваш заказ принят! Спасибо 😊";
+        localStorage.removeItem('cart');
+        renderCartItems();
+        updateCartCounter();
+      } catch(e) {
+        document.getElementById('order-status').innerHTML = "Ошибка при отправке заказа!";
       }
     };
-  }
-  function sendOrderEmail(cartItems, userEmail) {
-    const params = buildEmailParams(cartItems, userEmail);
-    return emailjs.send('service_xxkj39b', 'template_qxz0943', params);
-  }
-  function sendOrderTelegram(cartItems, userEmail) {
-    const TOKEN = '8153668086:AAHgyGjLfbkA2xQk4_Oyk6cwwbltXqXsLUg';
-    const CHAT_ID = '2114460264';
-    let msg = `Новый заказ!\nEmail: ${userEmail}\nТовары:\n`;
-    msg += cartItems.map(p => `${p.name} — ${p.price} ₽`).join('\n');
-    msg += `\nВсего: ${cartItems.reduce((s, p) => s + p.price, 0)} ₽`;
-    const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
-    return fetch(url, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
-    });
-  }
-
-  document.getElementById('order-btn').onclick = async function() {
-    const user = firebase.auth().currentUser;
-    if (!user) { alert('Необходимо войти для оформления заказа!'); return; }
-    const cartItems = getCartData();
-    if (!cartItems.length) return alert('Корзина пуста');
-    document.getElementById('order-status').innerHTML = "Отправка заказа...";
-    try {
-      await sendOrderEmail(cartItems, user.email);
-      await sendOrderTelegram(cartItems, user.email);
-      document.getElementById('order-status').innerHTML = "Ваш заказ принят! Спасибо 😊";
-      localStorage.removeItem('cart');
-      renderCartItems();
-      updateCartCounter();
-    } catch(e) {
-      document.getElementById('order-status').innerHTML = "Ошибка при отправке заказа!";
-    }
-  };
-</script>
+  </script>
+</body>
+</html>
