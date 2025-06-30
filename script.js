@@ -281,6 +281,14 @@ function renderParts(arr) {
         <div class="price ${priceClass}">
           <span class="price-value">${p.price.toLocaleString('ru-RU')}</span> ₽ ${flag}
         </div>
+
+        <!-- КНОПКА КУПИТЬ: -->
+    <button class="btn buy-btn" 
+            data-id="${p.id}" 
+            ${p.stock <= 0 ? 'disabled' : ''} 
+            style="margin:10px 0 0 0;">
+      Купить
+    </button>
         <button class="btn analysis-btn" data-id="${p.id}" style="margin-top:8px;">Показать историю цен</button>
         <div class="analysis-container" id="analysis-${p.id}" style="display:none; margin-top:16px;"></div>
         <div class="toast-hint" id="toast-${p.id}"></div>
@@ -328,7 +336,40 @@ function renderParts(arr) {
       setAnalysisAutoClose(container, btn);
     }
   }));
+  document.querySelectorAll('.buy-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const partId = btn.dataset.id;
+    // Проверка: авторизован ли пользователь?
+    if (!isUserLoggedIn()) {
+      // Показывай модальное окно авторизации
+      authModal.style.display = "flex";
+      return;
+    }
+    // Добавь логику добавления в корзину
+    addToCart(partId);
+    // Покажи сообщение или анимацию
+    btn.textContent = "В корзине!";
+    setTimeout(() => btn.textContent = "Купить", 2000);
+  });
+});
+
+function isUserLoggedIn() {
+  return firebase.auth().currentUser != null;
 }
+function addToCart(partId) {
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  if (!cart.includes(partId)) cart.push(partId);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCartCounter();
+}
+}
+
+function updateCartCounter() {
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  document.getElementById('cart-counter').textContent = cart.length;
+}
+document.addEventListener('DOMContentLoaded', updateCartCounter);
+
 
 function setAnalysisAutoClose(container, btn) {
   let lastActive = Date.now();
