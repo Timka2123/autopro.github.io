@@ -122,15 +122,23 @@
     };
 
     // --- EmailJS ---
-    function sendOrderEmail(cartItems, userEmail) {
-      const orderList = cartItems.map(p => `<li>${p.name} (${p.id}) — ${p.price} ₽</li>`).join('');
-      const templateParams = {
-        user_email: userEmail,
-        order_html: `<ul>${orderList}</ul>`,
-        order_total: cartItems.reduce((s, p) => s + p.price, 0)
-      };
-      return emailjs.send('service_xxkj39b', 'template_qxz0943', templateParams);
+   
+
+    const templateParams = {
+    order_id: 123456,
+    email: "test@site.ru",
+    orders: [
+        { image_url: "https://site.ru/img/1.jpg", name: "Масляный фильтр", units: 1, price: 1500 },
+        { image_url: "https://site.ru/img/2.jpg", name: "Свеча зажигания", units: 2, price: 310 }
+    ],
+    cost: {
+        shipping: 0,
+        tax: 0,
+        total: 2120
     }
+    };
+
+    emailjs.send('service_xxkj39b', 'template_qxz0943', templateParams);
     // --- Telegram ---
     function sendOrderTelegram(cartItems, userEmail) {
       const TOKEN = '8153668086:AAHgyGjLfbkA2xQk4_Oyk6cwwbltXqXsLUg';
