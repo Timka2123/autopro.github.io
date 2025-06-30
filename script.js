@@ -351,6 +351,7 @@ function renderParts(arr) {
     btn.textContent = "В корзине!";
     setTimeout(() => btn.textContent = "Купить", 2000);
   });
+  updateCartCounter();
 });
 
 function isUserLoggedIn() {
@@ -360,7 +361,7 @@ function addToCart(partId) {
   let cart = JSON.parse(localStorage.getItem('cart') || '[]');
   if (!cart.includes(partId)) cart.push(partId);
   localStorage.setItem('cart', JSON.stringify(cart));
-  updateCartCounter();
+  updateCartCounter(); // Обновляем сразу после добавления
 }
 }
 
