@@ -128,10 +128,20 @@
     }
 
     function sendOrderEmail(cartItems, userEmail) {
-      const params = buildEmailParams(cartItems, userEmail);
-      // ID сервиса и шаблона смотри в EmailJS (service_xxkj39b и template_qxz0943)
-      return emailjs.send('service_xxkj39b', 'template_qxz0943', params);
-    }
+  // Формируем список товаров строкой
+  const orderText = cartItems.map((p, idx) =>
+    `${idx + 1}. ${p.name} (арт. ${p.id}), Кол-во: 1 — ${p.price} ₽`
+  ).join('\n');
+
+  const templateParams = {
+    email: userEmail,
+    order_text: orderText,
+    order_total: cartItems.reduce((s, p) => s + p.price, 0)
+  };
+
+  // Вставь сюда твой service_id и template_id для текстового письма!
+  return emailjs.send('service_xxkj39b', 'template_qxz0943', templateParams);
+}
 
     function sendOrderTelegram(cartItems, userEmail) {
       const TOKEN = '8153668086:AAHgyGjLfbkA2xQk4_Oyk6cwwbltXqXsLUg';
