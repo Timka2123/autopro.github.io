@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Корзина | Autopro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Стили (замени на свои пути, если нужно) -->
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
@@ -37,14 +36,25 @@
   <!-- Firebase, EmailJS и твои скрипты -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
-    // Инициализация EmailJS (service_xxx)
-    emailjs.init('service_xxkj39b');
-  </script>
-  <script src="your-app-main.js"></script>
-  <script>
-    // partsData должен быть загружен из export_fixed.json до загрузки этой страницы!
+    // Firebase config и инициализация
+    const firebaseConfig = {
+      apiKey: "AIzaSyAjVd0NGBE3_r4Ot9phZ-SzIhWMyEYNfrw",
+      authDomain: "autopro-e3161.firebaseapp.com",
+      projectId: "autopro-e3161",
+      storageBucket: "autopro-e3161.appspot.com",
+      messagingSenderId: "274244574652",
+      appId: "1:274244574652:web:012f0b403667f98b5c1fb9",
+      measurementId: "G-G0FH4XQTCC"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // Инициализация EmailJS Public Key (а не service!)
+    emailjs.init('Q78mxFzz_Dx_tyVpO');
+
+    // Загрузка каталога
     let partsData = [];
     fetch('export_fixed.json').then(r => r.json()).then(d => { partsData = d; renderCartItems(); });
 
