@@ -1,6 +1,15 @@
 document.addEventListener('DOMContentLoaded', function() {
   // --- Инициализация Firebase ---
-  const firebaseConfig = { ... }; // твои ключи
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAjVd0NGBE3_r4Ot9phZ-SzIhWMyEYNfrw",
+  authDomain: "autopro-e3161.firebaseapp.com",
+  projectId: "autopro-e3161",
+  storageBucket: "autopro-e3161.firebasestorage.app",
+  messagingSenderId: "274244574652",
+  appId: "1:274244574652:web:012f0b403667f98b5c1fb9",
+  measurementId: "G-G0FH4XQTCC"
+};
   if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
 
@@ -17,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const authMessage = document.getElementById('auth-message');
   const userEmail = document.getElementById('user-email');
 
-  // --- Переменные каталога и анализа ---
+  // --- Каталог, фильтры и анализ ---
   let partsData = [];
   let prevPrices = new Map();
   const updatedProducts = new Set();
@@ -41,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (cartCounter) cartCounter.textContent = cart.length;
   }
 
-  // --- Открытие/закрытие модального окна ---
+  // --- Модальное окно (логин/регистрация) ---
   if (loginBtn) loginBtn.onclick = () => {
     authModal.classList.add('show');
     loginForm.style.display = "block";
@@ -113,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
       .replace(/(\s+)(\S+)/g, (m, s, w) => s + w.toLowerCase());
   }
 
-  // --- Каталог ---
+  // --- Каталог и рендер ---
   function loadAndRender() {
     fetch('export_fixed.json?ts=' + Date.now(), { cache: 'no-store' })
       .then(res => res.json())
@@ -419,7 +428,7 @@ home?.addEventListener('mouseleave', () => {
 });
 
 // --- Swiper ---
-const baseOpts = { /* ... твои опции ... */ };
+const baseOpts = { /* твои опции */ };
 try {
   if (typeof Swiper !== 'undefined') {
     new Swiper('.vehicles-slider', baseOpts);
