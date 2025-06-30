@@ -128,18 +128,24 @@
     }
 
     function sendOrderEmail(cartItems, userEmail) {
-  // Формируем список товаров строкой
-  const orderText = cartItems.map((p, idx) =>
-    `${idx + 1}. ${p.name} (арт. ${p.id}), Кол-во: 1 — ${p.price} ₽`
-  ).join('\n');
-
+  const orderId = Date.now(); // Временная метка как номер заказа
+  const orders = cartItems.map(p => ({
+    image_url: p.img || '',
+    name: p.name,
+    units: 1, // Если появится поддержка количества — подставлять реально
+    price: p.price
+  }));
+  const total = cartItems.reduce((sum, p) => sum + p.price, 0);
   const templateParams = {
+    order_id: orderId,
     email: userEmail,
-    order_text: orderText,
-    order_total: cartItems.reduce((s, p) => s + p.price, 0)
+    orders: orders,
+    cost: {
+      shipping: 0,
+      tax: 0,
+      total: total
+    }
   };
-
-  // Вставь сюда твой service_id и template_id для текстового письма!
   return emailjs.send('service_xxkj39b', 'template_qxz0943', templateParams);
 }
 
