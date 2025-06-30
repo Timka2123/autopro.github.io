@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
   };
   if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
+  
 
   // --- DOM-элементы ---
   const authModal = document.getElementById('auth-modal');
@@ -24,7 +25,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const regMessage = document.getElementById('reg-message');
   const authMessage = document.getElementById('auth-message');
   const userEmail = document.getElementById('user-email'); // если выводишь почту
-
+  
+ 
   // --- Открытие и закрытие модального окна ---
   loginBtn.onclick = () => {
   authModal.classList.add('show');
