@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const regMessage = document.getElementById('reg-message');
   const authMessage = document.getElementById('auth-message');
   const userEmail = document.getElementById('user-email'); // если выводишь почту
-  
+  console.log('authModal найден?', authModal);
  
   // --- Открытие и закрытие модального окна ---
   loginBtn.onclick = () => {
