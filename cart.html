@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Корзина | Autopro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Стили -->
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
@@ -20,7 +19,6 @@
     .empty-cart { text-align: center; color: #bbb; margin: 2em 0; font-size: 1.2em; }
     #order-btn { width: 100%; background: linear-gradient(90deg,#ffc107,#f44336); color: #232323; font-weight: bold; border: none; border-radius: 10px; font-size: 1.25em; padding: 0.9em; cursor: pointer; transition: .2s; box-shadow: 0 3px 10px #f4433644;}
     #order-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    #order-status { min-height: 2em; }
     @media (max-width: 600px) {
       .container { padding: 1em .5em; }
     }
@@ -35,12 +33,12 @@
     <div id="order-status" style="margin-top:1.2em; text-align:center;"></div>
   </div>
 
-  <!-- Firebase, EmailJS, и твои скрипты -->
+  <!-- Firebase, EmailJS и твои скрипты -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
-    // Firebase config и инициализация
+    // --- Firebase config ---
     const firebaseConfig = {
       apiKey: "AIzaSyAjVd0NGBE3_r4Ot9phZ-SzIhWMyEYNfrw",
       authDomain: "autopro-e3161.firebaseapp.com",
@@ -53,15 +51,13 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // EmailJS public key
-    emailjs.init('Q78mxFzz_Dx_tyVpO');
-  </script>
-  <script>
-    // Загрузи каталог товаров
+    // --- EmailJS ---
+    emailjs.init('Q78mxFzz_Dx_tyVpO'); // PUBLIC KEY!
+
+    // --- Data loading ---
     let partsData = [];
     fetch('export_fixed.json').then(r => r.json()).then(d => { partsData = d; renderCartItems(); });
 
-    // Получить содержимое корзины
     function getCartData() {
       const cart = JSON.parse(localStorage.getItem('cart') || '[]');
       return cart.map(id => partsData.find(p => p.id == id)).filter(Boolean);
@@ -105,41 +101,47 @@
       if (el) el.textContent = cart.length;
     }
 
-    // Отправка заказа (EmailJS + Telegram)
+    // --- Оформление заказа ---
     document.getElementById('order-btn').onclick = async function() {
       const user = firebase.auth().currentUser;
       if (!user) { alert('Необходимо войти для оформления заказа!'); return; }
-      const userEmail = user.email;
       const cartItems = getCartData();
       if (!cartItems.length) return alert('Корзина пуста');
       document.getElementById('order-status').innerHTML = "Отправка заказа...";
-      // Подготовить параметры для EmailJS
+
+      // Формируем orders для шаблона EmailJS
+      const ordersArr = cartItems.map(item => ({
+        name: item.name,
+        units: 1, // если реализуешь количество, меняй тут
+        price: item.price
+      }));
+
+      const order_total = cartItems.reduce((sum, p) => sum + p.price, 0);
+
+      // Отправляем письмо на email
       const templateParams = {
-        email: userEmail,
-        orders: cartItems.map(item => ({
-          name: item.name,
-          units: 1, // Если будет поддержка количества — заменишь здесь
-          price: item.price
-        })),
-        order_total: cartItems.reduce((sum, p) => sum + p.price, 0)
+        email: user.email,     // вот тут email пользователя!
+        orders: ordersArr,     // массив для {{#orders}}...{{/orders}}
+        order_total: order_total
       };
-      try {
-        // Отправить заказ на почту через EmailJS
-        await emailjs.send('service_xxkj39b', 'template_qxz0943', templateParams);
 
-        // Отправить заказ в Telegram
-        await sendOrderTelegram(cartItems, userEmail);
+      // Отправка EmailJS
+      emailjs.send('service_xxkj39b', 'template_qxz0943', templateParams)
+        .then(function(response) {
+            document.getElementById('order-status').innerHTML = "Ваш заказ принят! Спасибо 😊";
+            localStorage.removeItem('cart');
+            renderCartItems();
+            updateCartCounter();
+        }, function(error) {
+            document.getElementById('order-status').innerHTML = "Ошибка EmailJS: " + JSON.stringify(error);
+            console.log('EmailJS error:', error);
+        });
 
-        document.getElementById('order-status').innerHTML = "Ваш заказ принят! Спасибо 😊";
-        localStorage.removeItem('cart');
-        renderCartItems();
-        updateCartCounter();
-      } catch(e) {
-        document.getElementById('order-status').innerHTML = "Ошибка при отправке заказа!";
-      }
+      // Отправляем в Telegram
+      await sendOrderTelegram(cartItems, user.email);
     };
 
-    // Отправка в Telegram
+    // --- Telegram ---
     function sendOrderTelegram(cartItems, userEmail) {
       const TOKEN = '8153668086:AAHgyGjLfbkA2xQk4_Oyk6cwwbltXqXsLUg';
       const CHAT_ID = '2114460264';
