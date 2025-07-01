@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Корзина | Autopro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Основные стили -->
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
@@ -34,12 +33,12 @@
     <div id="order-status" style="margin-top:1.2em; text-align:center;"></div>
   </div>
 
-  <!-- Скрипты: Firebase, EmailJS -->
+  <!-- Firebase, EmailJS и твои скрипты -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
-    // --- Firebase config ---
+    // Firebase config и инициализация
     const firebaseConfig = {
       apiKey: "AIzaSyAjVd0NGBE3_r4Ot9phZ-SzIhWMyEYNfrw",
       authDomain: "autopro-e3161.firebaseapp.com",
@@ -52,19 +51,20 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // --- EmailJS init ---
-    emailjs.init('Q78mxFzz_Dx_tyVpO'); // Public key (НЕ service!)
+    // Инициализация EmailJS (Public key)
+    emailjs.init('Q78mxFzz_Dx_tyVpO');
 
-    // --- Загрузка каталога ---
+    // Каталог (загрузи свои данные или используй заглушку)
     let partsData = [];
     fetch('export_fixed.json').then(r => r.json()).then(d => { partsData = d; renderCartItems(); });
 
-    // --- Получить содержимое корзины ---
     function getCartData() {
       const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-      // Преобразуем массив в {id, qty} если нужно будет поддержка количества
-      // Пока qty=1
-      return cart.map(id => partsData.find(p => p.id == id)).filter(Boolean);
+      // Если есть поле units — используем, если нет — 1 шт
+      return cart.map(id => {
+        const item = partsData.find(p => p.id == id);
+        return item ? {...item, units: item.units || 1} : null;
+      }).filter(Boolean);
     }
 
     function removeFromCart(id) {
@@ -94,70 +94,18 @@
           </span>
         </div>
       `).join('');
-      total.innerHTML = `<b>Итого: ${cartItems.reduce((s, p) => s + p.price, 0)} ₽</b>`;
+      total.innerHTML = `<b>Итого: ${cartItems.reduce((s, p) => s + (p.price * (p.units || 1)), 0)} ₽</b>`;
       orderBtn.disabled = false;
     }
 
-    // --- Для иконки корзины в header (если есть) ---
+    // Для обновления иконки корзины в header (если нужен)
     function updateCartCounter() {
       let cart = JSON.parse(localStorage.getItem('cart') || '[]');
       let el = document.getElementById('cart-counter');
       if (el) el.textContent = cart.length;
     }
 
-    // --- Формируем параметры для шаблона EmailJS ---
-    function buildEmailParams(cartItems, userEmail) {
-      const orderId = Date.now(); // Можно сделать красивее
-      const orders = cartItems.map(p => ({
-        image_url: p.img || '',
-        name: p.name,
-        units: 1, // Если сделаешь поддержку количества — сюда подставить реальное qty
-        price: p.price
-      }));
-      const total = cartItems.reduce((sum, p) => sum + p.price, 0);
-      return {
-        order_id: orderId,
-        email: userEmail,
-        orders: orders,
-        cost: {
-          shipping: 0,
-          tax: 0,
-          total: total
-        }
-      };
-    }
-
-    function sendOrderEmail(cartItems, userEmail) {
-  const order_total = cartItems.reduce((sum, p) => sum + p.price, 0);
-
-  const templateParams = {
-    email: userEmail,
-    orders: cartItems.map(p => ({
-      name: p.name,
-      units: p.units || 1,
-      price: p.price
-    })),
-    order_total: order_total
-  };
-  return emailjs.send('service_xxkj39b', 'template_qxz0943', templateParams);
-}
-
-
-    function sendOrderTelegram(cartItems, userEmail) {
-      const TOKEN = '8153668086:AAHgyGjLfbkA2xQk4_Oyk6cwwbltXqXsLUg';
-      const CHAT_ID = '2114460264';
-      let msg = `Новый заказ!\nEmail: ${userEmail}\nТовары:\n`;
-      msg += cartItems.map(p => `${p.name} — ${p.price} ₽`).join('\n');
-      msg += `\nВсего: ${cartItems.reduce((s, p) => s + p.price, 0)} ₽`;
-      const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
-      return fetch(url, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
-      });
-    }
-
-    // --- Оформление заказа ---
+    // Оформление заказа
     document.getElementById('order-btn').onclick = async function() {
       const user = firebase.auth().currentUser;
       if (!user) { alert('Необходимо войти для оформления заказа!'); return; }
@@ -175,6 +123,40 @@
         document.getElementById('order-status').innerHTML = "Ошибка при отправке заказа!";
       }
     };
+
+    // --- EmailJS ---
+    function sendOrderEmail(cartItems, userEmail) {
+      // Собираем массив товаров для шаблона EmailJS
+      const orders = cartItems.map(p => ({
+        name: p.name,
+        units: p.units || 1,
+        price: p.price
+      }));
+      const order_total = orders.reduce((sum, p) => sum + p.price * (p.units || 1), 0);
+
+      const templateParams = {
+        email: userEmail,
+        orders: orders,
+        order_total: order_total
+      };
+      // !!! Укажи свой service_id и template_id
+      return emailjs.send('service_xxkj39b', 'template_qxz0943', templateParams);
+    }
+
+    // --- Telegram ---
+    function sendOrderTelegram(cartItems, userEmail) {
+      const TOKEN = '8153668086:AAHgyGjLfbkA2xQk4_Oyk6cwwbltXqXsLUg';
+      const CHAT_ID = '2114460264';
+      let msg = `Новый заказ!\nEmail: ${userEmail}\nТовары:\n`;
+      msg += cartItems.map(p => `${p.name} — ${p.price} ₽ x ${p.units || 1}`).join('\n');
+      msg += `\nВсего: ${cartItems.reduce((s, p) => s + (p.price * (p.units || 1)), 0)} ₽`;
+      const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+      return fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
+      });
+    }
   </script>
 </body>
 </html>
