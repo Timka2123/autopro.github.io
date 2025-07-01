@@ -128,26 +128,20 @@
     }
 
     function sendOrderEmail(cartItems, userEmail) {
-  const orderId = Date.now(); // Временная метка как номер заказа
-  const orders = cartItems.map(p => ({
-    image_url: p.img || '',
-    name: p.name,
-    units: 1, // Если появится поддержка количества — подставлять реально
-    price: p.price
-  }));
-  const total = cartItems.reduce((sum, p) => sum + p.price, 0);
+  const order_total = cartItems.reduce((sum, p) => sum + p.price, 0);
+
   const templateParams = {
-    order_id: orderId,
     email: userEmail,
-    orders: orders,
-    cost: {
-      shipping: 0,
-      tax: 0,
-      total: total
-    }
+    orders: cartItems.map(p => ({
+      name: p.name,
+      units: p.units || 1,
+      price: p.price
+    })),
+    order_total: order_total
   };
   return emailjs.send('service_xxkj39b', 'template_qxz0943', templateParams);
 }
+
 
     function sendOrderTelegram(cartItems, userEmail) {
       const TOKEN = '8153668086:AAHgyGjLfbkA2xQk4_Oyk6cwwbltXqXsLUg';
